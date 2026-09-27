@@ -95,6 +95,12 @@ class WinSystem:
             api.CloseDesktop(desk)
 
 
+def _mss():
+    import mss
+
+    return mss.MSS() if hasattr(mss, "MSS") else mss.mss()
+
+
 # -- screen ---------------------------------------------------------------------------------
 
 
@@ -142,18 +148,15 @@ class WinScreen:
         return self._generation
 
     def capture(self, region: Rect) -> Capture:
-        import mss
         import mss.tools
 
-        with mss.mss() as sct:
+        with _mss() as sct:
             shot = sct.grab({"left": region.x, "top": region.y, "width": region.width, "height": region.height})
             png = mss.tools.to_png(shot.rgb, shot.size)
         return Capture(region, png, shot.size[0], shot.size[1])
 
     def get_pixel(self, x: int, y: int) -> tuple[int, int, int]:
-        import mss
-
-        with mss.mss() as sct:
+        with _mss() as sct:
             shot = sct.grab({"left": x, "top": y, "width": 1, "height": 1})
             return tuple(shot.pixel(0, 0))  # type: ignore[return-value]
 
@@ -404,6 +407,10 @@ class WinWindows:
     def set_state(self, hwnd: int, state: str) -> None:
         cmd = {"minimize": api.SW_MINIMIZE, "maximize": api.SW_MAXIMIZE, "restore": api.SW_RESTORE}[state]
         api.ShowWindow(hwnd, cmd)
+        if state == "restore" and api.IsZoomed(hwnd):
+            # A window minimized from maximized is restored to maximized first; "restore" means
+            # the normal (non-maximized) state, so restore once more.
+            api.ShowWindow(hwnd, api.SW_RESTORE)
         if state != "minimize":
             self.focus(hwnd)
 

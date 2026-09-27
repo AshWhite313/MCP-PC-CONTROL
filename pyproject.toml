@@ -1,0 +1,43 @@
+[project]
+name = "mcp-pc-control"
+version = "0.1.0"
+description = "MCP server that lets an AI agent observe and operate a desktop computer (Windows first)."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=2.2,<3",
+    "pydantic>=2.7",
+    "pillow>=10",
+    "mss>=9; sys_platform == 'win32'",
+]
+
+[project.scripts]
+mcp-pc-control = "pc_control.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "anyio>=4",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pc_control"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "windows: requires a real interactive Windows desktop",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+ignore = ["E501"]

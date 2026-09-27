@@ -1,0 +1,39 @@
+# Default policy for mcp-pc-control. Copy it, edit it and pass it with --policy.
+# Unknown keys are rejected, so typos fail loudly at startup.
+
+[general]
+# observe  : read-only (screenshots, window list)
+# interact : + mouse, keyboard, window management
+# operate  : + files, starting apps (future phases)
+# full     : + shell, killing processes (future phases) — still with confirmations
+level = "interact"
+# Which tools are exposed: observe | desktop | full
+profile = "desktop"
+# Human confirmation channels, in order of preference. native_dialog is a dialog shown by this
+# server on the local desktop (the AI client cannot answer it). elicitation asks through the MCP client.
+confirmation_channels = ["native_dialog", "elicitation"]
+confirmation_timeout_s = 120
+disabled_tools = []
+
+[limits]
+max_actions_per_minute = 120
+max_wait_ms = 120000
+# Global hotkey that stops (and, pressed again, resumes) all automation.
+killswitch_hotkey = "ctrl+alt+shift+f12"
+
+[audit]
+enabled = true
+# dir = "%LOCALAPPDATA%/mcp-pc-control/audit"   (default)
+# Typed text is replaced by its length in the audit log unless this is true.
+log_typed_text = false
+
+[privacy]
+redact_patterns = ["credit_card", "cpf", "api_key"]
+
+[processes]
+kill_protected = ["csrss.exe", "wininit.exe", "winlogon.exe", "lsass.exe", "services.exe", "smss.exe",
+                  "svchost.exe", "MsMpEng.exe", "dwm.exe"]
+
+[screen]
+# Screenshots are downscaled so the longest side is at most this many pixels.
+max_long_edge = 1568

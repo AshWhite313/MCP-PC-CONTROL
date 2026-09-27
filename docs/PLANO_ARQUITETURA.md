@@ -1,6 +1,6 @@
 # MCP-PC-CONTROL — Plano de Arquitetura e Implementação
 
-> Status: **proposta para revisão** (nenhum código implementado ainda).
+> Status: **aprovado**. Fases 0 e 1 implementadas (veja o README e `docs/adr/`).
 > Plataforma inicial: **Windows 11**. Backends futuros: Linux, macOS.
 
 ---
@@ -31,7 +31,7 @@
 - **Ideia central de confiabilidade:** *semântica antes de pixels*. Primeiro UI Automation (desktop) e árvore de acessibilidade/DOM (navegador); depois OCR; depois visão do modelo sobre screenshot anotado; coordenadas absolutas só como último recurso — e sempre com verificação pós-ação.
 - **Ideia central de observabilidade:** toda ação retorna um envelope estruturado com o que foi feito, onde, em qual janela/app, quanto demorou, que efeitos colaterais apareceram (novas janelas, diálogos, mudança de foco) e se a **expectativa declarada** (`expect`) foi atendida.
 - **Ideia central de segurança:** níveis de permissão, política declarativa (allow/deny, pastas permitidas), **confirmação humana fora do alcance do modelo** (a IA nunca pode se autoaprovar), auditoria encadeada por hash, botão de parada de emergência, indicador visível, e tratamento de todo conteúdo lido da tela/web/arquivos como **não confiável** (defesa contra *prompt injection*).
-- **Stack recomendada:** Python 3.12+ com SDK MCP oficial; Win32 via `ctypes`/`pywin32`; UIA via `comtypes` (IUIAutomation, com CacheRequest); captura via `mss` + Windows.Graphics.Capture; OCR nativo `Windows.Media.Ocr`; processos via `psutil` + Job Objects; navegador via Playwright com perfil dedicado.
+- **Stack recomendada:** Python 3.11+ com SDK MCP oficial (2.x); Win32 via `ctypes`/`pywin32`; UIA via `comtypes` (IUIAutomation, com CacheRequest); captura via `mss` + Windows.Graphics.Capture; OCR nativo `Windows.Media.Ocr`; processos via `psutil` + Job Objects; navegador via Playwright com perfil dedicado.
 - **Arquitetura portável:** interface MCP + núcleo (políticas, pipeline, esperas) independentes de SO; cada SO implementa um conjunto de *Protocols* (`ScreenBackend`, `InputBackend`, `WindowBackend`, `AccessibilityBackend`...).
 - **Roadmap:** 7 fases, começando por spikes técnicos e um MVP "ver e agir", e só então UIA, sistema, navegador, visão/OCR e hardening.
 
@@ -233,7 +233,7 @@ Extensões futuras (fora do escopo inicial): **App adapters** (ex.: automação 
 
 ### 4.1 Linguagem do servidor
 
-| Critério | **Python 3.12+** | C# / .NET 8 | Rust | TypeScript/Node |
+| Critério | **Python 3.11+** | C# / .NET 8 | Rust | TypeScript/Node |
 |---|---|---|---|---|
 | SDK MCP oficial | ✅ maduro (`mcp`, FastMCP embutido) | ✅ oficial (mantido com a Microsoft) | ✅ `rmcp` | ✅ referência |
 | UI Automation | ✅ via `comtypes` (COM direto) ou `uiautomation` | ⭐ excelente (FlaUI / UIA3) | ⚠️ COM verboso (`windows-rs`) | ❌ fraco (addons nativos) |
@@ -245,7 +245,7 @@ Extensões futuras (fora do escopo inicial): **App adapters** (ex.: automação 
 | Distribuição | ⚠️ `uv`/`pipx` ou PyInstaller | ⭐ single-file | ⭐ binário único | ✅ |
 | Desempenho | ✅ suficiente (latência dominada pelo modelo) | ⭐ | ⭐ | ✅ |
 
-**Recomendação: Python 3.12+.** Melhor equilíbrio entre ecossistema (MCP, Playwright, psutil, OpenCV, WinRT), velocidade de desenvolvimento e o caminho para Linux/macOS. A latência de cada tool é pequena perto do tempo de inferência do modelo. Riscos conhecidos (desempenho de UIA via COM em árvores enormes, empacotamento) são mitigados com CacheRequest e com a possibilidade de, se necessário, mover UIA para um helper nativo em C# sem mudar a interface (`AccessibilityBackend`).
+**Recomendação: Python 3.11+.** Melhor equilíbrio entre ecossistema (MCP, Playwright, psutil, OpenCV, WinRT), velocidade de desenvolvimento e o caminho para Linux/macOS. A latência de cada tool é pequena perto do tempo de inferência do modelo. Riscos conhecidos (desempenho de UIA via COM em árvores enormes, empacotamento) são mitigados com CacheRequest e com a possibilidade de, se necessário, mover UIA para um helper nativo em C# sem mudar a interface (`AccessibilityBackend`).
 
 **Alternativa séria: C#/.NET 8 com FlaUI** — seria a escolha se o projeto fosse *somente* Windows para sempre. Registrar essa decisão em um ADR.
 
@@ -752,10 +752,11 @@ Padrão sugerido na instalação: **`interact`**. Cada tool declara o nível mí
 
 - Classificação de risco por ação: `safe` → `sensitive` → `destructive` → `critical`, calculada pelo servidor a partir da tool **e** dos parâmetros (ex.: `fs_write mode=overwrite`, `fs_delete`, `process_kill`, `window_close mode=force`, shell não classificado como somente leitura, clique em elemento com nome de alto impacto, navegação para domínio fora da allowlist, upload de arquivo).
 - **ConfirmationBroker**, em ordem:
-  1. **MCP elicitation** — o cliente mostra ao usuário a ação exata (tool, alvo, parâmetros relevantes, motivo da classificação) e pede aprovar/negar.
-  2. **Diálogo nativo do próprio servidor** (janela local sempre visível) quando o cliente não suporta elicitation.
+  1. **Diálogo nativo do próprio servidor** (janela local sempre visível), que o cliente MCP não consegue responder por conta própria.
+  2. **MCP elicitation** — o cliente mostra ao usuário a ação exata (tool, alvo, parâmetros relevantes, motivo da classificação) e pede aprovar/negar.
   3. Sem canal disponível → **negar** (`CONFIRMATION_REQUIRED`).
 - **Não existe parâmetro `confirm=true`** que o modelo possa passar. Se existisse, uma injeção de prompt poderia preenchê-lo.
+- Enquanto uma confirmação está pendente, todas as tools que mudam estado são recusadas — o agente não consegue clicar em "Sim" no próprio diálogo.
 - Opções de conveniência controladas pelo usuário na política: "aprovar esta ação para este alvo pelos próximos N minutos", nunca para `critical`.
 
 ### 9.4 PathGuard (arquivos)
@@ -811,7 +812,7 @@ Padrão sugerido na instalação: **`interact`**. Cada tool declara o nível mí
 [general]
 level = "interact"                       # observe | interact | operate | full
 profile = "desktop"
-confirmation_channels = ["elicitation", "native_dialog"]
+confirmation_channels = ["native_dialog", "elicitation"]
 
 [filesystem]
 allowed_roots = ["known:Documents", "known:Downloads", "known:Desktop", "%USERPROFILE%\\AgentWorkspace"]

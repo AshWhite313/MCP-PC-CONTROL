@@ -20,9 +20,16 @@ Próxima fase acordada com o usuário em 2026-09-28.
 
 Tools `browser_*` com Playwright e perfil dedicado do agente: abrir e navegar, abas, snapshot com refs, clicar, preencher, selecionar, esperar, screenshot, downloads para pastas permitidas, diálogos. Política de URLs. Login, 2FA e CAPTCHA ficam com o usuário.
 
-## Critério de saída
+## Situação
 
-Fluxo de download de relatório num site local de testes, verificado.
+Concluída em 2026-09-28: 16 tools browser_* implementadas e testadas com Chromium real no CI.
+
+## Critério de saída (atendido)
+
+Fluxo num site local de testes: abrir, navegar, preencher login (senha não é relida nem registrada),
+selecionar opção, clicar, baixar o CSV para pasta permitida (verificado por conteúdo), esperar por texto.
+Cliques de alto impacto ("Excluir tudo") pedem confirmação; browser_evaluate é desligado por padrão;
+downloads passam pelo PathGuard.
 
 ## See Also
 

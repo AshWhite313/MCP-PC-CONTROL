@@ -18,7 +18,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--backend", default="auto", choices=["auto", "windows", "fake"])
     parser.add_argument("--level", choices=["observe", "interact", "operate", "full"],
                         help="Override the permission level from the policy.")
-    parser.add_argument("--profile", choices=["observe", "desktop", "full"], help="Override the tool profile.")
+    parser.add_argument("--profile", choices=["observe", "desktop", "browser", "full"], help="Override the tool profile.")
     parser.add_argument("--verify-audit", metavar="FILE", help="Verify an audit log hash chain and exit.")
     parser.add_argument("--log-level", default="WARNING")
     args = parser.parse_args(argv)

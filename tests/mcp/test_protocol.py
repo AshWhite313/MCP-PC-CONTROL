@@ -25,7 +25,12 @@ PHASE2_TOOLS = {
     "ui_toggle", "ui_expand", "ui_scroll_into_view", "ui_focus", "ui_menu_select", "ui_wait",
     "screen_diff", "screen_wait_change",
 }
-ALL_TOOLS = PHASE1_TOOLS | PHASE2_TOOLS
+PHASE4_TOOLS = {
+    "browser_open", "browser_close", "browser_tabs", "browser_navigate", "browser_snapshot", "browser_wait",
+    "browser_click", "browser_fill", "browser_select", "browser_press", "browser_screenshot",
+    "browser_get_content", "browser_download_wait", "browser_upload", "browser_dialog", "browser_evaluate",
+}
+ALL_TOOLS = PHASE1_TOOLS | PHASE2_TOOLS | PHASE4_TOOLS
 
 
 async def test_catalog_schemas_and_annotations(harness):

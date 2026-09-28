@@ -12,9 +12,13 @@ proporcional ao poder da ferramenta.
 | Fase | Conteúdo | Situação |
 |---|---|---|
 | 0 | Fundação: pipeline de ações, envelope de resultado, erros, política, auditoria, kill switch, confirmação humana | ✅ |
-| 1 | MVP "ver e agir": sistema, tela, mouse, teclado, janelas (29 tools) | ✅ implementado; testado no desktop simulado; testes no Windows real rodam no CI |
-| 2 | UI Automation, esperas e verificação avançadas | próxima |
-| 3–6 | Processos, arquivos, shell, clipboard, navegador, OCR, hardening | planejadas |
+| 1 | MVP "ver e agir": sistema, tela, mouse, teclado, janelas (29 tools) | ✅ testado no Windows real (CI) |
+| 2 | UI Automation, esperas e verificação (16 tools) | ✅ testado no Windows real (CI) |
+| 3 | Processos, arquivos, shell, clipboard | fora do escopo por ora (ver `docs/adr/`) |
+| 4 | Navegador via Playwright (16 tools) | ✅ testado com Chromium real (CI) |
+| 5–6 | OCR, visão, hardening | planejadas |
+
+Total: 61 tools.
 
 ## Instalação
 
@@ -24,6 +28,7 @@ Requisitos: Windows 10/11, Python 3.11+ e [uv](https://docs.astral.sh/uv/).
 git clone https://github.com/AshWhite313/MCP-PC-CONTROL
 cd MCP-PC-CONTROL
 uv sync
+uv run playwright install chromium   # baixa o navegador usado pelas tools browser_*
 ```
 
 ### Claude Desktop

@@ -22,9 +22,11 @@ from pc_control.core.errors import ErrorCode, ToolError
 from pc_control.core.input_state import InputState
 from pc_control.core.screenshots import EncodedCapture, capture_region
 from pc_control.platform.base import Backend
+from pc_control.platform.folders import known_folder
 from pc_control.security.audit import AuditLog
 from pc_control.security.confirm import ConfirmationBroker
 from pc_control.security.controls import KillSwitch, RateLimiter
+from pc_control.security.path_guard import PathGuard
 from pc_control.security.policy import PolicyEngine, Risk
 from pc_control.security.redaction import Redactor
 
@@ -51,6 +53,10 @@ class ToolSpec:
     mutating: bool
     profiles: frozenset[str]
     idempotent: bool = False
+    # The tool confirms from inside (after inspecting its target). The runner then starts the
+    # operation at SENSITIVE, and mark_performed() refuses to act until the tool has escalated
+    # back to the declared risk. Prevents acting before the deferred confirmation happened.
+    deferred_confirmation: bool = False
 
 
 @dataclass
@@ -89,7 +95,7 @@ class Operation:
         self.rt = rt
         self.spec = spec
         self.ctx = ctx
-        self.risk = spec.risk
+        self.risk = min(spec.risk, Risk.SENSITIVE) if spec.deferred_confirmation else spec.risk
         self.confirmation: dict | None = None
         self.performed = False
 
@@ -105,6 +111,9 @@ class Operation:
 
     def mark_performed(self) -> None:
         """Call right before the first side effect, so errors report action_performed correctly."""
+        if self.risk < self.spec.risk:
+            raise ToolError(ErrorCode.INTERNAL, f"{self.spec.name} tried to act without the required confirmation.",
+                            retryable=False)
         self.performed = True
 
     async def call(self, fn: Callable[..., Any], *args: Any) -> Any:
@@ -125,12 +134,28 @@ class Runtime:
             config.general.confirmation_channels, backend.confirm_dialog, config.general.confirmation_timeout_s
         )
         self.captures = CaptureRegistry()
+        self.paths = PathGuard(config.filesystem.allowed_roots, config.filesystem.denied_globs, known_folder)
         self.input = InputState(backend.input)
+        self._browser = None  # lazily created BrowserManager
         self.refs = RefRegistry()
         self.conditions = ConditionEngine(backend, self.refs)
         self._action_lock = asyncio.Lock()
         self.confirmation_pending = False  # state-changing actions never interleave
         self.killswitch.on_change(lambda engaged: engaged and self.input.release_all())
+
+    @property
+    def browser(self):
+        if self._browser is None:
+            from pc_control.browser.manager import BrowserManager
+            from pc_control.browser.urlguard import UrlGuard
+
+            cfg = self.config.browser
+            self._browser = BrowserManager(cfg, UrlGuard(cfg.url_allowlist, cfg.url_denylist))
+        return self._browser
+
+    async def aclose(self) -> None:
+        if self._browser is not None and self._browser.running:
+            await self._browser.close()
 
     # -- policy -----------------------------------------------------------------
 

@@ -20,7 +20,8 @@ from pc_control.security.policy import Risk
 PROFILES = {
     "observe": frozenset({"observe"}),
     "desktop": frozenset({"observe", "desktop"}),
-    "full": frozenset({"observe", "desktop", "full"}),
+    "browser": frozenset({"observe", "browser"}),
+    "full": frozenset({"observe", "desktop", "full", "browser"}),
 }
 
 # -- common parameter types -------------------------------------------------------------
@@ -130,6 +131,7 @@ class Registry:
         profile: str,
         title: str,
         idempotent: bool = False,
+        deferred_confirmation: bool = False,
     ) -> Callable[[Callable], Callable]:
         spec = ToolSpec(
             name=name,
@@ -138,6 +140,7 @@ class Registry:
             mutating=risk > Risk.SAFE,
             profiles=frozenset({profile}),
             idempotent=idempotent,
+            deferred_confirmation=deferred_confirmation,
         )
 
         def decorator(fn: Callable) -> Callable:

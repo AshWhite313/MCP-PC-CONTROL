@@ -136,6 +136,17 @@ class TextBox:
 
 
 @runtime_checkable
+class ClipboardBackend(Protocol):
+    """Plain-text clipboard. ``read_text`` returns (text or None, sensitive): sensitive is True when the
+    source app (e.g. a password manager) marked the content as not for monitoring."""
+
+    def read_text(self) -> tuple[str | None, bool]: ...
+    def write_text(self, text: str) -> None: ...
+    def clear(self) -> None: ...
+    def sequence(self) -> int: ...
+
+
+@runtime_checkable
 class OcrBackend(Protocol):
     def available(self) -> bool: ...
     def languages(self) -> list[str]: ...
@@ -285,6 +296,7 @@ class Backend:
     windows: WindowBackend
     accessibility: AccessibilityBackend | None = None
     ocr: OcrBackend | None = None
+    clipboard: ClipboardBackend | None = None
     # Local confirmation dialog shown by the server itself (title, message) -> approved.
     confirm_dialog: Callable[[str, str], bool] | None = None
     # Starts OS integrations (global kill-switch hotkey, tray indicator). Optional.

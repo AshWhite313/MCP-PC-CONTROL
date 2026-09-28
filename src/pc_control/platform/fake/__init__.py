@@ -348,6 +348,7 @@ class FakeDesktop:
 
 
 def make_fake_backend(desktop: FakeDesktop | None = None, *, with_dialog: bool = True) -> Backend:
+    from pc_control.platform.fake.clipboard import FakeClipboard
     from pc_control.platform.fake.ocr import FakeOcr
 
     d = desktop or FakeDesktop()
@@ -360,6 +361,7 @@ def make_fake_backend(desktop: FakeDesktop | None = None, *, with_dialog: bool =
         confirm_dialog=d.confirm_dialog if with_dialog else None,
         accessibility=d.acc,
         ocr=FakeOcr(d),
+        clipboard=FakeClipboard(),
     )
     b.desktop = d  # type: ignore[attr-defined]  # convenience for tests
     return b

@@ -14,12 +14,12 @@ proporcional ao poder da ferramenta.
 | 0 | Fundação: pipeline de ações, envelope de resultado, erros, política, auditoria, kill switch, confirmação humana | ✅ |
 | 1 | MVP "ver e agir": sistema, tela, mouse, teclado, janelas (29 tools) | ✅ testado no Windows real (CI) |
 | 2 | UI Automation, esperas e verificação (16 tools) | ✅ testado no Windows real (CI) |
-| 3 | Processos, arquivos, shell, clipboard | fora do escopo por ora (ver `docs/adr/`) |
+| 3 | Modelo simples: arquivos (ler, buscar, criar pasta, copiar, mover), clipboard, lista de processos (12 tools) | ✅ parcial; shell e encerrar/iniciar processos ficam fora (ver `docs/adr/`) |
 | 4 | Navegador via Playwright (16 tools) | ✅ testado com Chromium real (CI) |
 | 5 | OCR, visão e privacidade (2 tools + anotação de capturas) | ✅ testado (OCR do Windows é opcional) |
 | 6 | Hardening: erros estruturados, bandeja, diagnóstico, encerramento limpo | ✅ |
 
-Total: 63 tools.
+Total: 75 tools.
 
 ## Instalação
 

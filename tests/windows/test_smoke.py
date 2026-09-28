@@ -201,3 +201,11 @@ def test_check_command():
     out = subprocess.run([sys.executable, "-m", "pc_control", "--check"], capture_output=True, text=True, timeout=120)
     assert "backend: windows" in out.stdout, out.stdout + out.stderr
     assert "UI Automation" in out.stdout
+
+
+async def test_clipboard_roundtrip(win):
+    env = await win.ok("clipboard_set", {"text": "área de transferência ✓"})
+    assert env["details"]["verified"]
+    env = await win.ok("clipboard_get", {})
+    assert env["text"] == "área de transferência ✓"
+    await win.ok("clipboard_clear", {})

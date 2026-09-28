@@ -14,3 +14,7 @@ Append-only. Most recent last.
 ## 2026-09-28 update: Fases 4 e 5
 - Fase 4 (navegador) e Fase 5 (OCR/visão) concluídas. Novas páginas: [[Navegador]] e [[OCR e Visão]].
 - Overview e milestone [[Fase 4 Navegador]] atualizados. Total do projeto: 63 tools.
+
+## 2026-09-28 update: Fase 6 e modelo simples da Fase 3
+- Fase 6 concluída (erros estruturados, bandeja, `--check`). [[Indicador na bandeja]] arquivado como resolvido.
+- Modelo simples da Fase 3 entregue; [[Fase 3 fora do escopo]] atualizado. Total: 75 tools.

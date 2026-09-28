@@ -24,10 +24,17 @@ Durante a implementação, a geração do assistente foi interrompida várias ve
 
 O assistente não reescreveu essa parte de outra forma, porque isso significaria testar o limite por tentativa e erro. O usuário aceitou seguir com a [[Fase 4 Navegador]], que não depende da Fase 3.
 
+## Atualização (modelo simples)
+
+A pedido do usuário, um recorte de baixo risco da Fase 3 foi entregue depois das Fases 4 a 6: arquivos
+(listar, buscar, ler texto, propriedades, criar pasta, copiar e mover, sem exclusão e com confirmação para
+sobrescrever), clipboard de texto (respeitando o marcador de conteúdo privado dos gerenciadores de senha) e
+lista de processos somente leitura. Shell e encerrar ou iniciar processos continuam fora.
+
 ## Consequências
 
 - A especificação da Fase 3 continua em `docs/PLANO_ARQUITETURA.md` e pode ser implementada fora desta sessão.
-- O fluxo "baixar relatório e mover para a pasta Relatórios" fica parcialmente coberto: o download pode ser feito pelo navegador, mas a movimentação de arquivos depende da Fase 3.
+- O fluxo "baixar relatório e mover para a pasta Relatórios" passou a ser coberto de ponta a ponta com o modelo simples.
 
 ## See Also
 

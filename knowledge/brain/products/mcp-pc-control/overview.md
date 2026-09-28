@@ -36,11 +36,12 @@ Linux e macOS estão previstos como backends futuros.
 | 0 | Fundação | concluída |
 | 1 | Tela, mouse, teclado, janelas (29 tools) | concluída, testada no Windows real |
 | 2 | [[UI Automation Tools]], comparação de tela (16 tools) | concluída, testada no Windows real |
-| 3 | Processos, arquivos, shell, clipboard | fora do escopo desta sessão, ver [[Fase 3 fora do escopo]] |
+| 3 | Modelo simples: arquivos, clipboard, lista de processos | parcial, ver [[Fase 3 fora do escopo]] |
 | 4 | Navegador | concluída, ver [[Fase 4 Navegador]] |
 | 5 | OCR, visão e privacidade | concluída, ver [[OCR e Visão]] |
+| 6 | Hardening: erros estruturados, bandeja, diagnóstico | concluída |
 
-Total publicado: 63 tools, 127 testes (desktop simulado + Chromium real) e testes de fumaça no Windows via CI.
+Total publicado: 75 tools, 141 testes (desktop simulado + Chromium real) e testes de fumaça no Windows via CI.
 
 ## Stack
 

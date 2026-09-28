@@ -8,6 +8,7 @@ dependencies = [
     "mcp>=2.2,<3",
     "pydantic>=2.7",
     "pillow>=10",
+    "psutil>=5.9",
     "mss>=9; sys_platform == 'win32'",
     "comtypes>=1.4; sys_platform == 'win32'",
     "playwright>=1.40",

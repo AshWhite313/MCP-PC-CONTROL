@@ -26,12 +26,14 @@ PHASE2_TOOLS = {
     "screen_diff", "screen_wait_change",
 }
 PHASE5_TOOLS = {"screen_ocr", "screen_find_text"}
+PHASE3_SIMPLE = {"fs_known_folders", "fs_list", "fs_search", "fs_stat", "fs_read", "fs_mkdir", "fs_copy", "fs_move",
+                 "clipboard_get", "clipboard_set", "clipboard_clear", "process_list"}
 PHASE4_TOOLS = {
     "browser_open", "browser_close", "browser_tabs", "browser_navigate", "browser_snapshot", "browser_wait",
     "browser_click", "browser_fill", "browser_select", "browser_press", "browser_screenshot",
     "browser_get_content", "browser_download_wait", "browser_upload", "browser_dialog", "browser_evaluate",
 }
-ALL_TOOLS = PHASE1_TOOLS | PHASE2_TOOLS | PHASE4_TOOLS | PHASE5_TOOLS
+ALL_TOOLS = PHASE1_TOOLS | PHASE2_TOOLS | PHASE4_TOOLS | PHASE5_TOOLS | PHASE3_SIMPLE
 
 
 async def test_catalog_schemas_and_annotations(harness):

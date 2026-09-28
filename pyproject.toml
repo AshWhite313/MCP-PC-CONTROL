@@ -10,6 +10,7 @@ dependencies = [
     "pillow>=10",
     "mss>=9; sys_platform == 'win32'",
     "comtypes>=1.4; sys_platform == 'win32'",
+    "playwright>=1.40",
 ]
 
 [project.scripts]

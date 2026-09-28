@@ -4,7 +4,7 @@ type: product
 created: 2026-09-27
 last_updated: 2026-09-28
 status: active
-related: ["[[Ciclo Observar-Verificar]]", "[[Backend Windows]]", "[[UI Automation Tools]]", "[[Verificação com expect]]", "[[Modelo de Segurança]]"]
+related: ["[[Ciclo Observar-Verificar]]", "[[Backend Windows]]", "[[UI Automation Tools]]", "[[Verificação com expect]]", "[[Modelo de Segurança]]", "[[Navegador]]", "[[OCR e Visão]]"]
 sources: ["2026-09-28_sessao-mcp-pc-control"]
 aliases: ["pc-control", "mcp-pc-control", "MCP de controle do PC"]
 tags: [mcp, computer-use, windows]
@@ -37,10 +37,10 @@ Linux e macOS estão previstos como backends futuros.
 | 1 | Tela, mouse, teclado, janelas (29 tools) | concluída, testada no Windows real |
 | 2 | [[UI Automation Tools]], comparação de tela (16 tools) | concluída, testada no Windows real |
 | 3 | Processos, arquivos, shell, clipboard | fora do escopo desta sessão, ver [[Fase 3 fora do escopo]] |
-| 4 | Navegador | pendente, ver [[Fase 4 Navegador]] |
-| 5 | OCR e visão | pendente |
+| 4 | Navegador | concluída, ver [[Fase 4 Navegador]] |
+| 5 | OCR, visão e privacidade | concluída, ver [[OCR e Visão]] |
 
-Total publicado: 45 tools, 105 testes no desktop simulado e testes de fumaça no Windows real via CI.
+Total publicado: 63 tools, 127 testes (desktop simulado + Chromium real) e testes de fumaça no Windows via CI.
 
 ## Stack
 

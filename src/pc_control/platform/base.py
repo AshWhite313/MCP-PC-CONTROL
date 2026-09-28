@@ -127,6 +127,25 @@ class Capture:
 
 
 @dataclass(frozen=True)
+class TextBox:
+    """A run of text recognized by OCR, in physical screen coordinates."""
+
+    text: str
+    bounds: Rect
+    confidence: float = 1.0
+
+
+@runtime_checkable
+class OcrBackend(Protocol):
+    def available(self) -> bool: ...
+    def languages(self) -> list[str]: ...
+    def recognize(self, png: bytes, origin: tuple[int, int], language: str | None) -> list[TextBox]:
+        """Recognize text in a PNG image. ``origin`` is the screen position of the image's top-left,
+        so the returned boxes are in screen coordinates."""
+        ...
+
+
+@dataclass(frozen=True)
 class ElementInfo:
     """A UI element as seen through the platform accessibility API (UIA on Windows).
 
@@ -265,6 +284,7 @@ class Backend:
     input: InputBackend
     windows: WindowBackend
     accessibility: AccessibilityBackend | None = None
+    ocr: OcrBackend | None = None
     # Local confirmation dialog shown by the server itself (title, message) -> approved.
     confirm_dialog: Callable[[str, str], bool] | None = None
     # Starts OS integrations (global kill-switch hotkey, tray indicator). Optional.

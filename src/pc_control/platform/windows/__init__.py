@@ -21,6 +21,7 @@ from pc_control.core.keys import normalize_combo
 from pc_control.platform.base import Backend, Capture, MonitorInfo, Rect, SystemInfo, WindowInfo
 from pc_control.platform.windows import win32 as api
 from pc_control.platform.windows.keymap import EXTENDED, LAYOUT_DEPENDENT, VK
+from pc_control.platform.windows.ocr import WindowsOcr
 from pc_control.platform.windows.uia import UiaBackend
 
 log = logging.getLogger(__name__)
@@ -515,6 +516,7 @@ def make_windows_backend() -> Backend:
         input=WinInput(),
         windows=WinWindows(screen),
         accessibility=UiaBackend(),
+        ocr=WindowsOcr(),
         confirm_dialog=confirm_dialog,
         start_services=start_services,
     )

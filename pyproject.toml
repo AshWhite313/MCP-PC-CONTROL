@@ -13,6 +13,17 @@ dependencies = [
     "playwright>=1.40",
 ]
 
+[project.optional-dependencies]
+# Windows OCR (screen_ocr / screen_find_text via OCR). Also needs a Windows language pack.
+ocr = [
+    "winrt-Windows.Media.Ocr; sys_platform == 'win32'",
+    "winrt-Windows.Graphics.Imaging; sys_platform == 'win32'",
+    "winrt-Windows.Storage.Streams; sys_platform == 'win32'",
+    "winrt-Windows.Globalization; sys_platform == 'win32'",
+    "winrt-Windows.Foundation; sys_platform == 'win32'",
+    "winrt-runtime; sys_platform == 'win32'",
+]
+
 [project.scripts]
 mcp-pc-control = "pc_control.__main__:main"
 

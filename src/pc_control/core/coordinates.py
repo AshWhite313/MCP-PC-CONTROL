@@ -40,6 +40,17 @@ class CaptureRecord:
         sy = self.bounds.y + y * self.bounds.height / self.image_height
         return round(sx), round(sy)
 
+    def to_image(self, sx: float, sy: float) -> tuple[int, int]:
+        """Screen coordinates back to image pixel coordinates (may fall outside the image)."""
+        ix = (sx - self.bounds.x) * self.image_width / self.bounds.width
+        iy = (sy - self.bounds.y) * self.image_height / self.bounds.height
+        return round(ix), round(iy)
+
+    def rect_to_image(self, rect) -> tuple[int, int, int, int]:
+        x0, y0 = self.to_image(rect.x, rect.y)
+        x1, y1 = self.to_image(rect.right, rect.bottom)
+        return x0, y0, x1, y1
+
 
 class CaptureRegistry:
     """Bounded LRU of capture records."""

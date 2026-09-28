@@ -15,12 +15,14 @@ Last rebuilt: 2026-09-28
 
 - **CI no Windows Real** (also: GitHub Actions, ci.yml) - Processo de validação do [[MCP-PC-CONTROL]] em `.github/workflows/ci.yml`. - `processes/ci-windows.md`
 
-### products (7)
+### products (9)
 
 - **Confirmação por diálogo nativo** (also: confirmation broker, canal de confirmação) - Ações destrutivas são confirmadas primeiro por um diálogo exibido pelo próprio servidor e só depois por elicitation do cliente MCP. - `products/mcp-pc-control/decisions/2026-09-27_confirmacao-nativa.md`
 - **Fase 3 fora do escopo** (also: Fase 3, shell e processos) - A Fase 3 do roadmap (processos, arquivos, shell, clipboard e interação com o humano) não foi entregue nesta sessão. - `products/mcp-pc-control/decisions/2026-09-28_fase-3-fora-do-escopo.md`
 - **MCP-PC-CONTROL** (also: pc-control, mcp-pc-control, MCP de controle do PC) - Servidor MCP local que permite a um agente de IA observar e operar um computador Windows 11. O repositório é `AshWhite313/MCP-PC-CONTROL`, branch de desenvolvimento `claude/vigilant-bardeen-s6z4af`. - `products/mcp-pc-control/overview.md`
 - **Modelo de Segurança** (also: segurança, política, kill switch, auditoria) - Conjunto de controles do [[MCP-PC-CONTROL]]. A premissa é que o modelo não é uma fronteira de segurança: toda decisão é tomada pelo servidor, com base em política configurada pelo usuário. - `products/mcp-pc-control/features/seguranca.md`
+- **Navegador** (also: browser_*, Playwright, Fase 4) - 16 tools de automação de navegador via Playwright, adicionadas na Fase 4 do [[MCP-PC-CONTROL]]. - `products/mcp-pc-control/features/navegador.md`
+- **OCR e Visão** (also: screen_ocr, screen_find_text, anotação, set-of-marks, zonas de privacidade, Fase 5) - Recursos da Fase 5 do [[MCP-PC-CONTROL]] para apps que não expõem controles acessíveis. - `products/mcp-pc-control/features/ocr-visao.md`
 - **Python e SDK MCP 2.x** (also: escolha da linguagem, ADR 0001) - O projeto usa Python 3.11+ e o SDK MCP oficial na versão 2.x. - `products/mcp-pc-control/decisions/2026-09-27_python-sdk-mcp-2.md`
 - **UI Automation Tools** (also: ui_*, UIA tools, Fase 2) - Conjunto de 14 tools que encontram e acionam controles pelo nome, sem coordenadas. Entrou na Fase 2 de [[MCP-PC-CONTROL]]. - `products/mcp-pc-control/features/ui-automation.md`
 - **Verificação com expect** (also: expect, effects, envelope de resultado) - Mecanismo que impede o agente de assumir que uma ação funcionou. Toda ação que muda estado pode declarar uma pós-condição, e todo resultado relata os efeitos colaterais observados. - `products/mcp-pc-control/features/verificacao-expect.md`

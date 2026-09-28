@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import io
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
 from PIL import Image
@@ -19,6 +19,7 @@ class EncodedCapture:
     data: bytes
     mime_type: str
     sha256: str
+    masked: list = field(default_factory=list)
 
     def meta(self) -> dict:
         return {
@@ -29,7 +30,30 @@ class EncodedCapture:
             "layout_generation": self.record.layout_generation,
             "sha256": self.sha256[:16],
             "hint": "Pass space={'capture_id': ...} to mouse tools to click on image coordinates.",
+            **({"privacy_masked": self.masked} if self.masked else {}),
         }
+
+
+def _apply_privacy(backend: Backend, img: Image.Image, region: Rect, processes: set[str]) -> list[dict]:
+    """Black out windows of privacy-sensitive processes inside the captured region. Returns the masks."""
+    from PIL import ImageDraw
+
+    masked = []
+    draw = ImageDraw.Draw(img)
+    for w in backend.windows.list_windows(include_minimized=False):
+        if w.process.casefold() not in processes:
+            continue
+        inter = w.bounds.intersect(region)
+        if inter is None:
+            continue
+        # region -> image pixel coordinates (image may be full-res here, before downscale)
+        sx = img.width / region.width
+        sy = img.height / region.height
+        box = [round((inter.x - region.x) * sx), round((inter.y - region.y) * sy),
+               round((inter.right - region.x) * sx), round((inter.bottom - region.y) * sy)]
+        draw.rectangle(box, fill=(0, 0, 0))
+        masked.append({"process": w.process, "title": w.title})
+    return masked
 
 
 def capture_region(
@@ -40,10 +64,12 @@ def capture_region(
     max_long_edge: int,
     fmt: Literal["png", "jpeg"] = "png",
     quality: int = 80,
+    privacy_processes: set[str] | None = None,
 ) -> EncodedCapture:
     raw = backend.screen.capture(region)
     img = Image.open(io.BytesIO(raw.png))
     img.load()
+    masked = _apply_privacy(backend, img, raw.bounds, privacy_processes) if privacy_processes else []
     long_edge = max(img.width, img.height)
     if long_edge > max_long_edge:
         ratio = max_long_edge / long_edge
@@ -57,7 +83,7 @@ def capture_region(
         mime = "image/png"
     data = buf.getvalue()
     rec = registry.add(raw.bounds, img.width, img.height, backend.screen.layout_generation(), data)
-    return EncodedCapture(rec, data, mime, hashlib.sha256(data).hexdigest())
+    return EncodedCapture(rec, data, mime, hashlib.sha256(data).hexdigest(), masked)
 
 
 def diff_regions(a: Image.Image, b: Image.Image, bounds: Rect, threshold: int = 24, cell: int = 16,

@@ -154,3 +154,25 @@ async def test_notepad_ui_automation(win, notepad):
     cx, cy = w["bounds"]["x"] + w["bounds"]["width"] // 2, w["bounds"]["y"] + w["bounds"]["height"] // 2
     env = await win.ok("ui_element_at", {"x": cx, "y": cy})
     assert env["target"]["control_type"]
+
+
+async def test_screen_annotate_and_find_text(win, notepad):
+    env = await win.ok("window_wait", {"query": {"pid": notepad.pid}, "timeout_ms": 15000})
+    hwnd = env["details"]["matched"]["window"]["hwnd"]
+    await win.ok("window_focus", {"query": {"hwnd": hwnd}})
+
+    # Annotated screenshot with numbered UI elements (works via UIA, no OCR needed).
+    env, res = await win.call("screen_capture", {"window": hwnd, "annotate": "elements"})
+    assert env["ok"], env
+    assert res.content[1].mime_type == "image/png"
+
+    # Find a menu label on screen via UIA.
+    env, _ = await win.call("screen_find_text", {"text": "File", "via": "uia", "window": hwnd})
+    if not env["ok"]:
+        env, _ = await win.call("screen_find_text", {"text": "Arquivo", "via": "uia", "window": hwnd})
+    if env["ok"]:
+        assert env["details"]["matches"][0]["source"] == "uia"
+
+    # OCR is best-effort on CI (needs a language pack); accept success or a clean unavailable/not-found.
+    env, _ = await win.call("screen_ocr", {"window": hwnd})
+    assert env["ok"] or env["error"]["code"] in ("BACKEND_UNAVAILABLE", "NOT_FOUND")

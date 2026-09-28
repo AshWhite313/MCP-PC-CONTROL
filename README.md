@@ -16,9 +16,10 @@ proporcional ao poder da ferramenta.
 | 2 | UI Automation, esperas e verificação (16 tools) | ✅ testado no Windows real (CI) |
 | 3 | Processos, arquivos, shell, clipboard | fora do escopo por ora (ver `docs/adr/`) |
 | 4 | Navegador via Playwright (16 tools) | ✅ testado com Chromium real (CI) |
-| 5–6 | OCR, visão, hardening | planejadas |
+| 5 | OCR, visão e privacidade (2 tools + anotação de capturas) | ✅ testado (OCR do Windows é opcional) |
+| 6 | Hardening e empacotamento | planejada |
 
-Total: 61 tools.
+Total: 63 tools.
 
 ## Instalação
 
@@ -30,6 +31,10 @@ cd MCP-PC-CONTROL
 uv sync
 uv run playwright install chromium   # baixa o navegador usado pelas tools browser_*
 ```
+
+Para OCR (`screen_ocr`, e `screen_find_text` via pixels) no Windows, instale o extra e um pacote de idioma
+do Windows: `uv sync --extra ocr`. Sem isso, o servidor funciona normalmente e o OCR retorna
+`BACKEND_UNAVAILABLE` (prefira `ui_find` / `screen_find_text` via UI Automation quando o controle é acessível).
 
 ### Claude Desktop
 

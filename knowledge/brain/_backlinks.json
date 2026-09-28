@@ -18,9 +18,10 @@
   "Ciclo Observar-Verificar": {
     "inbound": [
       "MCP-PC-CONTROL",
+      "OCR e Visão",
       "Verificação com expect"
     ],
-    "count": 2
+    "count": 3
   },
   "Confirmação por diálogo nativo": {
     "inbound": [
@@ -39,9 +40,10 @@
   "Fase 4 Navegador": {
     "inbound": [
       "Fase 3 fora do escopo",
-      "MCP-PC-CONTROL"
+      "MCP-PC-CONTROL",
+      "Navegador"
     ],
-    "count": 2
+    "count": 3
   },
   "Indicador na bandeja": {
     "inbound": [],
@@ -56,11 +58,13 @@
       "Fase 3 fora do escopo",
       "Fase 4 Navegador",
       "Modelo de Segurança",
+      "Navegador",
+      "OCR e Visão",
       "Python e SDK MCP 2.x",
       "UI Automation Tools",
       "Verificação com expect"
     ],
-    "count": 10
+    "count": 12
   },
   "Modelo de Segurança": {
     "inbound": [
@@ -68,9 +72,23 @@
       "Fase 3 fora do escopo",
       "Indicador na bandeja",
       "MCP-PC-CONTROL",
+      "Navegador",
+      "OCR e Visão",
       "UI Automation Tools"
     ],
-    "count": 5
+    "count": 7
+  },
+  "Navegador": {
+    "inbound": [
+      "MCP-PC-CONTROL"
+    ],
+    "count": 1
+  },
+  "OCR e Visão": {
+    "inbound": [
+      "MCP-PC-CONTROL"
+    ],
+    "count": 1
   },
   "Python e SDK MCP 2.x": {
     "inbound": [
@@ -83,16 +101,18 @@
       "Backend Windows",
       "Ciclo Observar-Verificar",
       "MCP-PC-CONTROL",
+      "OCR e Visão",
       "Verificação com expect"
     ],
-    "count": 4
+    "count": 5
   },
   "Verificação com expect": {
     "inbound": [
       "Ciclo Observar-Verificar",
       "MCP-PC-CONTROL",
+      "Navegador",
       "UI Automation Tools"
     ],
-    "count": 3
+    "count": 4
   }
 }

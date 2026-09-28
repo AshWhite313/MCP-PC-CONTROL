@@ -53,6 +53,9 @@ class AuditConfig(_Section):
 
 class PrivacyConfig(_Section):
     redact_patterns: list[Literal["credit_card", "cpf", "api_key", "email"]] = ["credit_card", "cpf", "api_key"]
+    # Windows of these processes (exe name, case-insensitive) are blacked out in every screenshot,
+    # so a password manager or banking app is never sent to the model.
+    never_capture_processes: list[str] = ["keepassxc.exe", "keepass.exe", "1password.exe", "bitwarden.exe"]
 
 
 class ProcessesConfig(_Section):

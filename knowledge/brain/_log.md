@@ -10,3 +10,7 @@ Append-only. Most recent last.
 - Fonte: registro da sessão Claude Code (agent log).
 - Criadas 12 páginas: produto [[MCP-PC-CONTROL]], funcionalidades [[UI Automation Tools]], [[Verificação com expect]] e [[Modelo de Segurança]]; decisões [[Python e SDK MCP 2.x]], [[Confirmação por diálogo nativo]] e [[Fase 3 fora do escopo]]; sistema [[Backend Windows]]; conceito [[Ciclo Observar-Verificar]]; processo [[CI no Windows Real]]; trabalho [[Fase 4 Navegador]] e [[Indicador na bandeja]].
 - Índice, backlinks e schema regenerados.
+
+## 2026-09-28 update: Fases 4 e 5
+- Fase 4 (navegador) e Fase 5 (OCR/visão) concluídas. Novas páginas: [[Navegador]] e [[OCR e Visão]].
+- Overview e milestone [[Fase 4 Navegador]] atualizados. Total do projeto: 63 tools.

@@ -97,14 +97,18 @@ def check_not_elevated(rt: Runtime, w: WindowInfo | None) -> None:
 
 def render(result: RunResult) -> CallToolResult:
     env = result.envelope
+    compact = {k: v for k, v in env.items() if k not in result.text_blocks}
     content: list[TextContent | ImageContent] = [
-        TextContent(type="text", text=json.dumps(env, ensure_ascii=False, separators=(",", ":")))
+        TextContent(type="text", text=json.dumps(compact, ensure_ascii=False, separators=(",", ":")))
     ]
+    for block in result.text_blocks.values():
+        content.append(TextContent(type="text", text=block))
     for img in result.images:
         content.append(
             ImageContent(type="image", data=base64.b64encode(img.data).decode(), mime_type=img.mime_type)
         )
-    return CallToolResult(content=content, structured_content=env, is_error=not env.get("ok", False))
+    structured = {**env, **result.text_blocks} if result.text_blocks else env
+    return CallToolResult(content=content, structured_content=structured, is_error=not env.get("ok", False))
 
 
 # -- registration -----------------------------------------------------------------------
@@ -158,3 +162,36 @@ class Registry:
             return fn
 
         return decorator
+
+
+async def click_at(op, rt: Runtime, x: int, y: int, button: str = "left", clicks: int = 1,
+                   modifiers: list[str] | None = None) -> None:
+    """Move to (x, y) and click, holding modifiers; shared by mouse and ui tools."""
+    import asyncio
+
+    op.mark_performed()
+    await op.call(op.backend.input.move_cursor, x, y)
+    mods = modifiers or []
+    try:
+        for m in mods:
+            await op.call(rt.input.key_down, m)
+        for i in range(clicks):
+            await op.call(rt.input.button_down, button)
+            await op.call(rt.input.button_up, button)
+            if i < clicks - 1:
+                await asyncio.sleep(0.03)
+    finally:
+        for m in reversed(mods):
+            await op.call(rt.input.key_up, m)
+
+
+async def check_high_impact(op, rt: Runtime, el, action: str) -> None:
+    """Escalate to a confirmed action when an element's label suggests something irreversible."""
+    from pc_control.core.elements import HIGH_IMPACT_TYPES, high_impact_keyword
+
+    if el is None or el.control_type not in HIGH_IMPACT_TYPES:
+        return
+    kw = high_impact_keyword(el.name, rt.config.ui.high_impact_keywords)
+    if kw:
+        await op.escalate(Risk.DESTRUCTIVE, f"{action} {el.control_type} {el.name!r} "
+                                            f"(label matches high-impact word {kw!r}).")

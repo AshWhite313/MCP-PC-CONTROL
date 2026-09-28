@@ -37,3 +37,8 @@ kill_protected = ["csrss.exe", "wininit.exe", "winlogon.exe", "lsass.exe", "serv
 [screen]
 # Screenshots are downscaled so the longest side is at most this many pixels.
 max_long_edge = 1568
+
+[ui]
+# Clicking an element whose label contains one of these words requires human confirmation.
+high_impact_keywords = ["excluir", "apagar", "deletar", "delete", "pagar", "pay", "comprar", "buy", "purchase",
+                        "transferir", "transfer", "enviar", "send", "desinstalar", "uninstall"]

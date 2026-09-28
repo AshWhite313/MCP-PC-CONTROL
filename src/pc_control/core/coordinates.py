@@ -44,16 +44,23 @@ class CaptureRecord:
 class CaptureRegistry:
     """Bounded LRU of capture records."""
 
-    def __init__(self, max_entries: int = 64) -> None:
+    def __init__(self, max_entries: int = 64, max_images: int = 16) -> None:
         self._records: OrderedDict[str, CaptureRecord] = OrderedDict()
+        self._images: OrderedDict[str, bytes] = OrderedDict()  # encoded image of recent captures
+        self._max_images = max_images
         self._ids = itertools.count(1)
         self._max = max_entries
         self._lock = threading.Lock()
 
-    def add(self, bounds: Rect, image_width: int, image_height: int, layout_generation: int) -> CaptureRecord:
+    def add(self, bounds: Rect, image_width: int, image_height: int, layout_generation: int,
+            data: bytes | None = None) -> CaptureRecord:
         with self._lock:
             rec = CaptureRecord(f"cap_{next(self._ids)}", bounds, image_width, image_height, layout_generation)
             self._records[rec.capture_id] = rec
+            if data is not None:
+                self._images[rec.capture_id] = data
+                while len(self._images) > self._max_images:
+                    self._images.popitem(last=False)
             while len(self._records) > self._max:
                 self._records.popitem(last=False)
             return rec
@@ -74,3 +81,11 @@ class CaptureRegistry:
                 suggestions=["Take a new screenshot with screen_capture and use its capture_id."],
             )
         return rec
+
+    def image(self, capture_id: str) -> bytes:
+        with self._lock:
+            data = self._images.get(capture_id)
+        if data is None:
+            raise ToolError(ErrorCode.NOT_FOUND, f"The image of {capture_id} is no longer kept.",
+                            suggestions=["Only the most recent captures are kept; take a new one."])
+        return data

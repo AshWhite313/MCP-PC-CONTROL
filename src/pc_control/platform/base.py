@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
-from typing import Literal, Protocol, runtime_checkable
+from typing import Any, Literal, Protocol, runtime_checkable
 
 MouseButton = Literal["left", "right", "middle"]
 WindowState = Literal["normal", "minimized", "maximized"]
@@ -126,6 +126,86 @@ class Capture:
     height: int
 
 
+@dataclass(frozen=True)
+class ElementInfo:
+    """A UI element as seen through the platform accessibility API (UIA on Windows).
+
+    ``handle`` is an opaque, backend-specific object (a COM pointer on Windows); it may
+    become invalid when the UI changes.
+    """
+
+    handle: Any = field(compare=False, repr=False)
+    runtime_id: tuple
+    name: str
+    control_type: str
+    automation_id: str = ""
+    class_name: str = ""
+    bounds: Rect | None = None
+    is_enabled: bool = True
+    is_offscreen: bool = False
+    has_focus: bool = False
+    is_password: bool = False
+    patterns: tuple[str, ...] = ()
+    value: str | None = None
+    is_read_only: bool | None = None
+    toggle_state: str | None = None
+    expand_state: str | None = None
+    is_selected: bool | None = None
+    window_hwnd: int | None = None
+    pid: int = 0
+    help_text: str = ""
+
+
+@dataclass
+class ElementNode:
+    info: ElementInfo
+    children: list[ElementNode] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class FindCriteria:
+    """Criteria pushed down to the backend; name matching is done in core."""
+
+    control_type: str | None = None
+    automation_id: str | None = None
+    class_name: str | None = None
+
+
+@runtime_checkable
+class AccessibilityBackend(Protocol):
+    """UI element tree access. Methods taking a handle raise ToolError(ELEMENT_STALE)
+    when the element no longer exists."""
+
+    def window_root(self, hwnd: int) -> Any: ...
+    def desktop_root(self) -> Any: ...
+    def is_alive(self, handle: Any) -> bool: ...
+    def info(self, handle: Any) -> ElementInfo: ...
+    def tree(self, root: Any, max_depth: int, max_nodes: int, include_offscreen: bool) -> tuple[ElementNode, bool]: ...
+    def find_all(self, root: Any, criteria: FindCriteria, max_results: int, include_offscreen: bool) -> list[ElementInfo]: ...
+    def children(self, handle: Any) -> list[ElementInfo]: ...
+    def parent(self, handle: Any) -> ElementInfo | None: ...
+    def element_at(self, x: int, y: int) -> ElementInfo | None: ...
+    def focused(self) -> ElementInfo | None: ...
+    def invoke(self, handle: Any) -> None: ...
+    def toggle(self, handle: Any) -> None: ...
+    def select(self, handle: Any) -> None: ...
+    def expand(self, handle: Any, expand: bool) -> None: ...
+    def set_value(self, handle: Any, value: str) -> None: ...
+    def get_text(self, handle: Any, max_chars: int) -> tuple[str, str]:
+        """Return (text, source) where source is 'text_pattern', 'value' or 'name'."""
+        ...
+    def scroll_into_view(self, handle: Any) -> None: ...
+    def set_focus(self, handle: Any) -> None: ...
+    def default_action(self, handle: Any) -> None:
+        """Legacy default action (MSAA DoDefaultAction)."""
+        ...
+    def clickable_point(self, handle: Any) -> tuple[int, int] | None: ...
+    def selected_items(self, handle: Any) -> list[ElementInfo]: ...
+    def popup_menus(self) -> list[Any]:
+        """Roots of currently open context/drop-down menus (they are separate top-level windows)."""
+        ...
+
+
 @runtime_checkable
 class SystemBackend(Protocol):
     name: str
@@ -184,6 +264,7 @@ class Backend:
     screen: ScreenBackend
     input: InputBackend
     windows: WindowBackend
+    accessibility: AccessibilityBackend | None = None
     # Local confirmation dialog shown by the server itself (title, message) -> approved.
     confirm_dialog: Callable[[str, str], bool] | None = None
     # Starts OS integrations (global kill-switch hotkey, tray indicator). Optional.

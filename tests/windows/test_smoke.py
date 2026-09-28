@@ -113,3 +113,39 @@ async def test_notepad_flow(win, notepad):
     if not env["details"]["closed"]:
         env = await win.ok("window_close", {"query": q, "mode": "force"})
         assert env["details"]["closed"]
+
+
+async def test_notepad_ui_automation(win, notepad):
+    env = await win.ok("window_wait", {"query": {"pid": notepad.pid}, "timeout_ms": 15000})
+    hwnd = env["details"]["matched"]["window"]["hwnd"]
+    await win.ok("window_focus", {"query": {"hwnd": hwnd}})
+
+    env = await win.ok("ui_snapshot", {"window": hwnd})
+    tree = env["tree"]
+    assert tree.startswith("Window [e"), tree[:200]
+    assert "MenuItem" in tree, tree[:2000]
+
+    env = await win.ok("ui_find", {"selector": {"control_type": "Edit", "window": hwnd}})
+    edit_ref = env["details"]["elements"][0]["ref"]
+    env = await win.ok("ui_set_value", {"ref": edit_ref, "value": "texto via UIA ✓"})
+    assert env["details"]["verified"] is True, env
+    env = await win.ok("ui_get_text", {"ref": edit_ref})
+    assert env["text"] == "texto via UIA ✓"
+
+    # Menu navigation opens the About dialog; close it with its OK button.
+    first_menu = [ln for ln in tree.splitlines() if "MenuItem" in ln]
+    help_label = "Help" if any("'Help'" in ln for ln in first_menu) else "Ajuda"
+    env = await win.call("ui_menu_select", {"path": [help_label, "About Notepad" if help_label == "Help"
+                                                                  else "Sobre o Bloco de Notas"],
+                                            "window": hwnd,
+                                            "expect": {"any_of": [{"kind": "window", "query": {"pid": notepad.pid,
+                                                       "title_contains": "Notepad" if help_label == "Help"
+                                                       else "Bloco"}, "state": "appears"}]}})
+    env = env[0]
+    if env["ok"]:
+        await win.ok("ui_click", {"selector": {"text": "OK", "control_type": "Button"}})
+
+    w = (await win.ok("window_get_active"))["details"]["window"]
+    cx, cy = w["bounds"]["x"] + w["bounds"]["width"] // 2, w["bounds"]["y"] + w["bounds"]["height"] // 2
+    env = await win.ok("ui_element_at", {"x": cx, "y": cy})
+    assert env["target"]["control_type"]

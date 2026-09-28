@@ -10,14 +10,15 @@ from pc_control import __version__
 from pc_control.config import Config
 from pc_control.core.runner import Runtime
 from pc_control.mcp_interface.common import Registry
-from pc_control.mcp_interface.tools import keyboard, mouse, screen, system, window
+from pc_control.mcp_interface.tools import keyboard, mouse, screen, system, ui, window
 from pc_control.platform.base import Backend
 from pc_control.security.audit import AuditLog
 
 INSTRUCTIONS = """\
 Tools to observe and operate this computer. Work in a loop: observe → act → verify.
 - Start with desktop_state (cheap, structured). Use screen_capture only when you need pixels.
-- Prefer structured targets (window hwnd, and later ui_* element refs) over raw coordinates.
+- Prefer ui_snapshot / ui_find and ui_click / ui_set_value / ui_select (controls by name) over coordinates.
+  Fall back to screenshots + mouse only when a control is not exposed.
 - Add `expect` to important actions so the server verifies the outcome; read `effects` in every result:
   it reports dialogs/windows that opened or closed and focus changes.
 - Errors have a stable `code`, `action_performed` and `suggestions`; follow them before retrying.
@@ -31,7 +32,8 @@ You are operating a real computer through the pc-control tools.
 
 1. Observe: desktop_state → which app/window is active, what is open, which monitor.
 2. Interpret the goal and plan the next small step.
-3. Act with the most specific tool (window_focus before typing; keyboard_hotkey for shortcuts).
+3. Act with the most specific tool: ui_snapshot to see a window's controls, then ui_click / ui_set_value /
+   ui_select / ui_menu_select with refs. window_focus before typing; keyboard_hotkey for shortcuts.
 4. Verify: pass `expect` (e.g. {any_of:[{kind:'window', query:{title_contains:'Save as'}, state:'appears'}]})
    or call window_wait / wait_for_any. Never assume a click worked.
 5. If the result differs (EXPECTATION_NOT_MET, unexpected effects.windows_opened), inspect the new state
@@ -46,7 +48,7 @@ def build_server(config: Config, backend: Backend, audit: AuditLog | None = None
     rt = Runtime(config, backend, audit)
     server = MCPServer("pc-control", instructions=INSTRUCTIONS, version=__version__)
     reg = Registry(server, rt, config.general.profile)
-    for module in (system, screen, mouse, keyboard, window):
+    for module in (system, screen, mouse, keyboard, window, ui):
         module.register(reg)
 
     @server.resource("pc://policy", name="policy", description="Effective policy (read-only).",

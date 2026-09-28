@@ -18,6 +18,7 @@ from pc_control.mcp_interface.common import (
     CaptureOpt,
     Registry,
     Space,
+    check_high_impact,
     check_not_elevated,
     render,
     resolve_point,
@@ -118,6 +119,14 @@ def register(reg: Registry) -> None:
             tx, ty = await _target(op, x, y, space)
             target_window = await op.call(op.backend.windows.window_at, tx, ty)
             await op.call(check_not_elevated, rt, target_window)
+            element = None
+            if op.backend.accessibility is not None:
+                try:
+                    element = await op.call(op.backend.accessibility.element_at, tx, ty)
+                except ToolError:
+                    element = None
+                # Clicking by coordinates must not bypass the confirmation ui_click would require.
+                await check_high_impact(op, rt, element, "Click")
             mods = [normalize_key(m) for m in modifiers]
             op.mark_performed()
             await _move(op, tx, ty)
@@ -136,7 +145,9 @@ def register(reg: Registry) -> None:
             where = target_window.title if target_window else "desktop"
             return Outcome(
                 f"{kind} {button} at ({tx}, {ty}) on {where!r}.",
-                target={"x": tx, "y": ty, "window": target_window.brief() if target_window else None},
+                target={"x": tx, "y": ty, "window": target_window.brief() if target_window else None,
+                        **({"element": {"name": element.name, "control_type": element.control_type}}
+                           if element else {})},
                 details={"button": button, "clicks": clicks, "modifiers": mods},
             )
 

@@ -17,6 +17,7 @@ from pc_control.config import Config, Level
 from pc_control.core import effects as fx
 from pc_control.core.conditions import ConditionEngine, Expectation
 from pc_control.core.coordinates import CaptureRegistry
+from pc_control.core.elements import RefRegistry
 from pc_control.core.errors import ErrorCode, ToolError
 from pc_control.core.input_state import InputState
 from pc_control.core.screenshots import EncodedCapture, capture_region
@@ -30,6 +31,16 @@ from pc_control.security.redaction import Redactor
 log = logging.getLogger(__name__)
 
 CaptureMode = Literal["none", "after", "before_after"]
+
+# Parameters holding text the user may consider private (typed into fields); only their
+# length is written to the audit log unless audit.log_typed_text is enabled.
+TYPED_PARAMS = {
+    "keyboard_type": ("text",),
+    "ui_set_value": ("value",),
+    "browser_fill": ("value",),
+    "clipboard_set": ("text", "html"),
+    "fs_write": ("content",),
+}
 
 
 @dataclass(frozen=True)
@@ -51,12 +62,16 @@ class Outcome:
     details: dict = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     images: list[EncodedCapture] = field(default_factory=list)
+    # Long human-readable text (e.g. an element tree): shown as plain text blocks and kept in
+    # the structured envelope, but not duplicated inside the JSON text block.
+    text_blocks: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
 class RunResult:
     envelope: dict
     images: list[EncodedCapture]
+    text_blocks: dict[str, str] = field(default_factory=dict)
 
     @property
     def ok(self) -> bool:
@@ -111,7 +126,8 @@ class Runtime:
         )
         self.captures = CaptureRegistry()
         self.input = InputState(backend.input)
-        self.conditions = ConditionEngine(backend)
+        self.refs = RefRegistry()
+        self.conditions = ConditionEngine(backend, self.refs)
         self._action_lock = asyncio.Lock()
         self.confirmation_pending = False  # state-changing actions never interleave
         self.killswitch.on_change(lambda engaged: engaged and self.input.release_all())
@@ -189,6 +205,7 @@ class Runtime:
         before: fx.DesktopSnapshot | None = None
         effects: dict | None = None
         images: list[EncodedCapture] = []
+        text_blocks: dict[str, str] = {}
         try:
             self.check_not_stopped()
             self.check_no_pending_confirmation(spec)
@@ -258,6 +275,7 @@ class Runtime:
                 envelope["warnings"] = outcome.warnings
             if op.confirmation:
                 envelope["confirmation"] = op.confirmation
+            text_blocks = {k: self.redactor.text(v) for k, v in outcome.text_blocks.items()}
         except ToolError as err:
             err.action_performed = err.action_performed or op.performed
             envelope = {"ok": False, "action": spec.name, "error": err.to_dict()}
@@ -295,10 +313,12 @@ class Runtime:
             effects=envelope.get("effects") or None,
             duration_ms=envelope["duration_ms"],
         )
-        return RunResult(envelope, images)
+        return RunResult(envelope, images, text_blocks)
 
     def _audit_params(self, tool: str, params: dict) -> dict:
         out = dict(params)
-        if not self.config.audit.log_typed_text and "text" in out and tool.startswith("keyboard"):
-            out["text"] = f"<{len(str(out['text']))} chars>"
+        if not self.config.audit.log_typed_text:
+            for key in TYPED_PARAMS.get(tool, ()):
+                if out.get(key) is not None:
+                    out[key] = f"<{len(str(out[key]))} chars>"
         return self.redactor.value(out)

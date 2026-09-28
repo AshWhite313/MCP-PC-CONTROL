@@ -66,6 +66,15 @@ class ScreenConfig(_Section):
     max_long_edge: int = Field(default=1568, ge=256, le=8192)
 
 
+class UiConfig(_Section):
+    # Clicking an element whose label contains one of these words (case/accent-insensitive,
+    # whole words) requires human confirmation.
+    high_impact_keywords: list[str] = [
+        "excluir", "apagar", "deletar", "delete", "pagar", "pay", "comprar", "buy", "purchase",
+        "transferir", "transfer", "enviar", "send", "desinstalar", "uninstall",
+    ]
+
+
 class Config(_Section):
     general: GeneralConfig = GeneralConfig()
     limits: LimitsConfig = LimitsConfig()
@@ -73,6 +82,7 @@ class Config(_Section):
     privacy: PrivacyConfig = PrivacyConfig()
     processes: ProcessesConfig = ProcessesConfig()
     screen: ScreenConfig = ScreenConfig()
+    ui: UiConfig = UiConfig()
 
     @property
     def level(self) -> Level:

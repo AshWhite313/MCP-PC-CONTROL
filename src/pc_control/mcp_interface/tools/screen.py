@@ -9,9 +9,10 @@ from mcp_types import CallToolResult
 from pydantic import BaseModel, ConfigDict, Field
 
 from pc_control.config import Level
+from pc_control.core.conditions import ScreenCondition, ScreenRegion
 from pc_control.core.errors import ErrorCode, ToolError
 from pc_control.core.runner import Operation, Outcome
-from pc_control.core.screenshots import capture_region
+from pc_control.core.screenshots import capture_region, diff_regions
 from pc_control.mcp_interface.common import Registry, Space, render, resolve_point
 from pc_control.platform.base import Rect
 from pc_control.security.policy import Risk
@@ -124,3 +125,68 @@ def register(reg: Registry) -> None:
                            details={"rgb": [r, g, b], "hex": hexcolor})
 
         return render(await rt.run(screen_get_pixel.spec, {"x": x, "y": y}, impl, ctx=ctx))
+
+    @reg.tool("screen_diff", level=Level.OBSERVE, risk=Risk.SAFE, profile="observe", title="Compare screenshots")
+    async def screen_diff(
+        ctx: Context,
+        before: Annotated[str, Field(description="capture_id of the earlier screenshot.")],
+        after: Annotated[str, Field(description="capture_id of a later screenshot of the same area, or 'now'.")] = "now",
+    ) -> CallToolResult:
+        """Compare two screenshots of the same area: fraction of changed pixels and the changed regions in
+        screen coordinates. Use it to confirm that something visibly happened, without re-reading images."""
+
+        async def impl(op: Operation) -> Outcome:
+            import io
+
+            from PIL import Image
+
+            gen = op.backend.screen.layout_generation()
+            rec_a = rt.captures.get(before, gen)
+            img_a = Image.open(io.BytesIO(rt.captures.image(before)))
+            if after == "now":
+                shot = await op.call(lambda: capture_region(op.backend, rt.captures, rec_a.bounds,
+                                                            max_long_edge=max(rec_a.image_width, rec_a.image_height)))
+                rec_b, data_b = shot.record, shot.data
+            else:
+                rec_b, data_b = rt.captures.get(after, gen), rt.captures.image(after)
+            if rec_b.bounds != rec_a.bounds:
+                raise ToolError(ErrorCode.INVALID_ARGUMENT, "The two captures cover different screen areas.")
+            ratio, regions = await op.call(diff_regions, img_a, Image.open(io.BytesIO(data_b)), rec_a.bounds)
+            return Outcome(
+                "No visible change." if ratio == 0 else f"{ratio:.2%} of pixels changed in {len(regions)} region(s).",
+                details={"changed_ratio": round(ratio, 5), "identical": ratio == 0, "regions": regions,
+                         "after_capture_id": rec_b.capture_id},
+            )
+
+        return render(await rt.run(screen_diff.spec, {"before": before, "after": after}, impl, ctx=ctx))
+
+    @reg.tool("screen_wait_change", level=Level.OBSERVE, risk=Risk.SAFE, profile="observe",
+              title="Wait for screen change")
+    async def screen_wait_change(
+        ctx: Context,
+        mode: Annotated[Literal["changes", "stable"], Field(description=(
+            "changes: wait until the area looks different from when the call started; "
+            "stable: wait until it stops changing for stable_ms (animations/loading finished)."))] = "changes",
+        region: Region | None = None,
+        window: Annotated[int | None, Field(description="Watch this window's area (hwnd).")] = None,
+        threshold: Annotated[float, Field(gt=0, le=1)] = 0.005,
+        stable_ms: Annotated[int, Field(ge=100, le=30_000)] = 600,
+        timeout_ms: Annotated[int, Field(ge=0, le=120_000)] = 10_000,
+    ) -> CallToolResult:
+        """Wait for a visual change (or for the screen to settle) in a region or window. For apps without
+        accessibility info; prefer ui_wait / window_wait when possible."""
+
+        async def impl(op: Operation) -> Outcome:
+            cond = ScreenCondition(
+                region=ScreenRegion(**region.model_dump()) if region else None, window=window, state=mode,
+                threshold=threshold, stable_ms=stable_ms,
+            )
+            timeout = min(timeout_ms, rt.config.limits.max_wait_ms)
+            res = await rt.conditions.wait_any([cond], timeout, is_cancelled=lambda: rt.killswitch.engaged)
+            if not res.met:
+                raise ToolError(ErrorCode.TIMEOUT, f"Screen did not become '{mode}' within {timeout} ms.",
+                                details=res.to_dict())
+            return Outcome(f"Screen condition '{mode}' met after {res.waited_ms} ms.", details=res.to_dict())
+
+        params = {"mode": mode, "region": region.model_dump() if region else None, "window": window}
+        return render(await rt.run(screen_wait_change.spec, params, impl, ctx=ctx))

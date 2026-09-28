@@ -20,11 +20,17 @@ PHASE1_TOOLS = {
     "window_list", "window_get_active", "window_find", "window_focus", "window_set_state",
     "window_move_resize", "window_close", "window_wait",
 }
+PHASE2_TOOLS = {
+    "ui_snapshot", "ui_find", "ui_get", "ui_element_at", "ui_get_text", "ui_click", "ui_set_value", "ui_select",
+    "ui_toggle", "ui_expand", "ui_scroll_into_view", "ui_focus", "ui_menu_select", "ui_wait",
+    "screen_diff", "screen_wait_change",
+}
+ALL_TOOLS = PHASE1_TOOLS | PHASE2_TOOLS
 
 
 async def test_catalog_schemas_and_annotations(harness):
     tools = (await harness.client.list_tools()).tools
-    assert {t.name for t in tools} == PHASE1_TOOLS
+    assert {t.name for t in tools} == ALL_TOOLS
     for t in tools:
         assert t.description and len(t.description) > 40, t.name
         assert "ctx" not in t.input_schema.get("properties", {}), t.name

@@ -59,6 +59,13 @@ def register(reg: Registry) -> None:
 
         async def impl(op: Operation) -> Outcome:
             fg = await _focused_target(op, require_focus)
+            acc = op.backend.accessibility
+            focused = None
+            if acc is not None:
+                try:
+                    focused = await op.call(acc.focused)
+                except ToolError:
+                    focused = None
             chunk = 1 if interval_ms else 64
             unmapped: list[str] = []
             op.mark_performed()
@@ -71,16 +78,31 @@ def register(reg: Registry) -> None:
                     unmapped += await op.call(op.backend.input.type_with_layout, part)
                 if interval_ms:
                     await asyncio.sleep(interval_ms / 1000)
+            verified = None
+            field = None
+            if focused is not None:
+                field = {"name": focused.name, "control_type": focused.control_type}
+                if not focused.is_password:
+                    await asyncio.sleep(0.05)
+                    try:
+                        now = await op.call(acc.info, focused.handle)
+                    except ToolError:
+                        now = None
+                    if now is not None and now.value is not None:
+                        typed = "".join(c for c in text if c not in unmapped).replace("\r\n", "\n")
+                        verified = typed.replace("\n", "") in (now.value or "").replace("\r", "").replace("\n", "")
             warnings = []
+            if verified is False:
+                warnings.append("The focused field does not contain the typed text; the app may have filtered it "
+                                "or focus moved. Check the field with ui_get_text.")
             if unmapped:
                 warnings.append(f"{len(unmapped)} character(s) have no key in the current layout and were "
                                 f"skipped: {''.join(sorted(set(unmapped)))[:20]!r}. Retry them with method='unicode'.")
             return Outcome(
                 f"Typed {len(text) - len(unmapped)} character(s) into {fg.title if fg else 'the focused window'!r}.",
                 target={"window": fg.brief() if fg else None},
-                details={"chars_sent": len(text) - len(unmapped), "method": method,
-                         "verified": None,
-                         "verification_hint": "Use expect, or read the field back (ui tools) to confirm."},
+                details={"chars_sent": len(text) - len(unmapped), "method": method, "verified": verified,
+                         **({"field": field} if field else {})},
                 warnings=warnings,
             )
 

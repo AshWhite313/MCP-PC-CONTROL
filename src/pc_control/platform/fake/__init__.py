@@ -25,6 +25,7 @@ from pc_control.platform.base import (
     SystemInfo,
     WindowInfo,
 )
+from pc_control.platform.fake.accessibility import FakeAccessibility, FakeElement
 
 
 @dataclass
@@ -44,6 +45,7 @@ class FakeWindow:
     text: str = ""
     restore_bounds: Rect | None = None
     close_blocked_by: Callable[[FakeWindow], None] | None = None
+    root: FakeElement | None = None
 
 
 @dataclass
@@ -73,6 +75,7 @@ class FakeDesktop:
         self._scheduled: list[tuple[float, Callable[[FakeDesktop], None]]] = []
         self.dialog_answers: list[bool] = []
         self.dialog_prompts: list[tuple[str, str]] = []
+        self.acc = FakeAccessibility(self)
 
     # -- setup helpers --------------------------------------------------------------
 
@@ -102,6 +105,15 @@ class FakeDesktop:
             else:
                 self.state.windows.append(w)
             return w
+
+    def add_element(self, parent: FakeWindow | FakeElement, name: str, control_type: str, **kw) -> FakeElement:
+        """Add a UI element. Bounds default to a slot inside the parent so clicks can find it."""
+        root = self.acc.root_of(parent) if isinstance(parent, FakeWindow) else parent
+        if "bounds" not in kw and root.bounds is not None:
+            n = len(root.children)
+            b = root.bounds
+            kw["bounds"] = Rect(b.x + 10, b.y + 40 + n * 30, min(200, b.width - 20), 24)
+        return root.add(FakeElement(name, control_type, **kw))
 
     def remove_window(self, hwnd: int) -> None:
         with self._lock:
@@ -228,17 +240,20 @@ class FakeDesktop:
             if w is not None:
                 self.focus(w.hwnd)
         self._emit({"type": "button", "button": button, "down": down, "x": x, "y": y})
+        if not down and button == "left":
+            self.acc.on_click(x, y)
 
     def mouse_wheel(self, dy: int, dx: int) -> None:
         self._emit({"type": "wheel", "dy": dy, "dx": dx})
 
     def key(self, key: str, down: bool) -> None:
         (self.state.keys_down.add if down else self.state.keys_down.discard)(key)
+        self.acc.on_key(key, down, self.state.keys_down)
         self._emit({"type": "key", "key": key, "down": down, "mods": sorted(self.state.keys_down)})
 
     def type_unicode(self, text: str) -> None:
         w = self._focused()
-        if w is not None:
+        if w is not None and not self.acc.on_text(text):
             w.text += text
         self._emit({"type": "text", "text": text, "method": "unicode"})
 
@@ -246,7 +261,7 @@ class FakeDesktop:
         unmapped = [c for c in text if ord(c) > 0xFF]
         typed = "".join(c for c in text if ord(c) <= 0xFF)
         w = self._focused()
-        if w is not None:
+        if w is not None and not self.acc.on_text(typed):
             w.text += typed
         self._emit({"type": "text", "text": typed, "method": "keys"})
         return unmapped
@@ -341,6 +356,7 @@ def make_fake_backend(desktop: FakeDesktop | None = None, *, with_dialog: bool =
         input=d,
         windows=d,
         confirm_dialog=d.confirm_dialog if with_dialog else None,
+        accessibility=d.acc,
     )
     b.desktop = d  # type: ignore[attr-defined]  # convenience for tests
     return b

@@ -125,8 +125,13 @@ async def test_notepad_ui_automation(win, notepad):
     assert tree.startswith("Window [e"), tree[:200]
     assert "MenuItem" in tree, tree[:2000]
 
-    env = await win.ok("ui_find", {"selector": {"control_type": "Edit", "window": hwnd}})
-    edit_ref = env["details"]["elements"][0]["ref"]
+    edit_ref = None
+    for ct in ("Edit", "Document"):
+        env, _ = await win.call("ui_find", {"selector": {"control_type": ct, "window": hwnd}})
+        if env["ok"]:
+            edit_ref = env["details"]["elements"][0]["ref"]
+            break
+    assert edit_ref, tree[:3000]
     env = await win.ok("ui_set_value", {"ref": edit_ref, "value": "texto via UIA ✓"})
     assert env["details"]["verified"] is True, env
     env = await win.ok("ui_get_text", {"ref": edit_ref})

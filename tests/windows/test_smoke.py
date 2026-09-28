@@ -176,3 +176,28 @@ async def test_screen_annotate_and_find_text(win, notepad):
     # OCR is best-effort on CI (needs a language pack); accept success or a clean unavailable/not-found.
     env, _ = await win.call("screen_ocr", {"window": hwnd})
     assert env["ok"] or env["error"]["code"] in ("BACKEND_UNAVAILABLE", "NOT_FOUND")
+
+
+def test_tray_and_hotkey_service():
+    from pc_control.platform.windows import start_services
+    from pc_control.security.controls import KillSwitch
+
+    ks = KillSwitch()
+    svc = start_services(killswitch=ks, hotkey="ctrl+alt+shift+f12")
+    try:
+        assert svc.hwnd, "tray window not created"
+        ks.engage("test")  # icon/tooltip refresh is posted to the tray thread
+        assert "PARADO" in svc.tooltip()
+        ks.release()
+        assert "PARADO" not in svc.tooltip()
+    finally:
+        svc.stop()
+    assert not svc._thread.is_alive()
+
+
+def test_check_command():
+    import subprocess
+
+    out = subprocess.run([sys.executable, "-m", "pc_control", "--check"], capture_output=True, text=True, timeout=120)
+    assert "backend: windows" in out.stdout, out.stdout + out.stderr
+    assert "UI Automation" in out.stdout

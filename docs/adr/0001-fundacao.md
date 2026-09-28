@@ -44,6 +44,6 @@ que foram abertos; o plugin pytest do anyio garante isso para fixtures assíncro
 
 ## Pendências registradas
 
-- Erros de validação de parâmetros gerados pelo SDK (tipos errados) retornam texto simples, não o envelope
-  estruturado. Avaliar um middleware na Fase 2.
-- Indicador visual (ícone de bandeja) ainda não implementado; hoje o kill switch avisa com um bipe.
+- Erros de validação de parâmetros gerados pelo SDK retornavam texto simples. Resolvido na Fase 6 com uma
+  extensão MCP que os converte para o envelope estruturado (ver ADR 0002).
+- Não havia indicador visual de que a IA controla o PC. Resolvido na Fase 6 com ícone na bandeja (ver ADR 0002).

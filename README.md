@@ -17,7 +17,7 @@ proporcional ao poder da ferramenta.
 | 3 | Processos, arquivos, shell, clipboard | fora do escopo por ora (ver `docs/adr/`) |
 | 4 | Navegador via Playwright (16 tools) | ✅ testado com Chromium real (CI) |
 | 5 | OCR, visão e privacidade (2 tools + anotação de capturas) | ✅ testado (OCR do Windows é opcional) |
-| 6 | Hardening e empacotamento | planejada |
+| 6 | Hardening: erros estruturados, bandeja, diagnóstico, encerramento limpo | ✅ |
 
 Total: 63 tools.
 
@@ -58,6 +58,12 @@ Em `%APPDATA%\Claude\claude_desktop_config.json`:
 claude mcp add pc-control -- uv --directory C:\caminho\para\MCP-PC-CONTROL run mcp-pc-control
 ```
 
+Antes de conectar um cliente, rode o diagnóstico:
+
+```powershell
+uv run mcp-pc-control --check
+```
+
 ### Opções de linha de comando
 
 | Opção | Descrição |
@@ -67,6 +73,8 @@ claude mcp add pc-control -- uv --directory C:\caminho\para\MCP-PC-CONTROL run m
 | `--profile observe\|desktop\|full` | Sobrescreve o conjunto de tools exposto |
 | `--backend fake` | Desktop simulado em memória (demonstração/testes, qualquer SO) |
 | `--verify-audit ARQ.jsonl` | Verifica a cadeia de hashes de um log de auditoria |
+| `--check` | Diagnóstico: backend, monitores, UI Automation, OCR, navegador, pastas, auditoria |
+| `--version` | Mostra a versão |
 
 ## Tools disponíveis (fase 1)
 
@@ -95,6 +103,8 @@ Recursos para o agente:
   não existe parâmetro de confirmação, e ações de input ficam bloqueadas enquanto uma confirmação está pendente.
 - **Kill switch**: `Ctrl+Alt+Shift+F12` (configurável) interrompe toda a automação e solta teclas/botões;
   pressione de novo para retomar. Não há tool que o desative.
+- **Ícone na bandeja** enquanto o servidor roda: mostra que uma IA pode controlar o PC, muda para um ícone de
+  alerta quando a automação está parada e tem menu (clique direito) para parar/retomar.
 - **Auditoria** em JSON Lines com encadeamento por hash (`--verify-audit`); o texto digitado não é registrado
   por padrão; padrões sensíveis (cartão, CPF, chaves de API) são redigidos.
 - Janelas de processos elevados (administrador), UAC e tela de bloqueio **não** são automatizadas: o servidor

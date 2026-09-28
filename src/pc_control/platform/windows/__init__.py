@@ -479,31 +479,18 @@ def _parse_hotkey(spec: str) -> tuple[int, int]:
     return mods, vk
 
 
-def start_services(*, killswitch, hotkey: str) -> None:
-    mods, vk = _parse_hotkey(hotkey)
-    ready = threading.Event()
-    status: dict = {}
+def start_services(*, killswitch, hotkey: str):
+    """Start the tray indicator and the kill-switch hotkey. Returns the service (call .stop() to end)."""
+    from pc_control.platform.windows.tray import TrayService
 
-    def loop() -> None:
-        if not api.RegisterHotKey(None, 1, mods, vk):
-            status["error"] = api.last_error_message()
-            ready.set()
-            return
-        ready.set()
-        msg = w.MSG()
-        while api.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
-            if msg.message == api.WM_HOTKEY:
-                killswitch.toggle()
-                api.MessageBeep(0x30 if killswitch.engaged else 0x40)
-                log.warning("kill switch %s", "ENGAGED" if killswitch.engaged else "released")
-        api.UnregisterHotKey(None, 1)
-
-    threading.Thread(target=loop, name="pc-control-hotkey", daemon=True).start()
-    ready.wait(2)
-    if "error" in status:
-        log.error("could not register kill-switch hotkey %s: %s", hotkey, status["error"])
-    else:
-        log.info("kill-switch hotkey %s registered", hotkey)
+    try:
+        parsed = _parse_hotkey(hotkey)
+    except (ValueError, ToolError) as e:
+        log.error("invalid kill-switch hotkey %r: %s", hotkey, e)
+        parsed = None
+    svc = TrayService(killswitch, parsed, hotkey)
+    svc.start()
+    return svc
 
 
 def make_windows_backend() -> Backend:

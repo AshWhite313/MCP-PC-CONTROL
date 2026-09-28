@@ -6,6 +6,7 @@ import argparse
 import logging
 import sys
 
+from pc_control import __version__
 from pc_control.config import load_config
 from pc_control.core.errors import ToolError
 from pc_control.platform.factory import create_backend
@@ -20,6 +21,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="Override the permission level from the policy.")
     parser.add_argument("--profile", choices=["observe", "desktop", "browser", "full"], help="Override the tool profile.")
     parser.add_argument("--verify-audit", metavar="FILE", help="Verify an audit log hash chain and exit.")
+    parser.add_argument("--check", action="store_true", help="Print a self-diagnosis report and exit.")
+    parser.add_argument("--version", action="version", version=f"mcp-pc-control {__version__}")
     parser.add_argument("--log-level", default="WARNING")
     args = parser.parse_args(argv)
 
@@ -45,12 +48,30 @@ def main(argv: list[str] | None = None) -> int:
         print(e.message, file=sys.stderr)
         return 2
 
+    if args.check:
+        from pc_control.diagnostics import check_main
+
+        return check_main(config, backend)
+
+    import asyncio
+
     from pc_control.server import build_server
 
     server, rt, _ = build_server(config, backend)
+    services = None
     if backend.start_services is not None:
-        backend.start_services(killswitch=rt.killswitch, hotkey=config.limits.killswitch_hotkey)
-    server.run("stdio")
+        services = backend.start_services(killswitch=rt.killswitch, hotkey=config.limits.killswitch_hotkey)
+    try:
+        server.run("stdio")
+    finally:
+        # Clean shutdown: release held input, close the browser, remove the tray icon.
+        rt.input.release_all()
+        try:
+            asyncio.run(rt.aclose())
+        except RuntimeError:
+            pass
+        if services is not None and hasattr(services, "stop"):
+            services.stop()
     return 0
 
 

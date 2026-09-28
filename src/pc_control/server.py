@@ -10,6 +10,7 @@ from pc_control import __version__
 from pc_control.config import Config
 from pc_control.core.runner import Runtime
 from pc_control.mcp_interface.common import Registry
+from pc_control.mcp_interface.structured_errors import StructuredErrors
 from pc_control.mcp_interface.tools import browser, keyboard, mouse, screen, system, ui, window
 from pc_control.platform.base import Backend
 from pc_control.security.audit import AuditLog
@@ -48,7 +49,8 @@ You are operating a real computer through the pc-control tools.
 
 def build_server(config: Config, backend: Backend, audit: AuditLog | None = None) -> tuple[MCPServer, Runtime, Registry]:
     rt = Runtime(config, backend, audit)
-    server = MCPServer("pc-control", instructions=INSTRUCTIONS, version=__version__)
+    server = MCPServer("pc-control", instructions=INSTRUCTIONS, version=__version__,
+                       extensions=[StructuredErrors(rt)])
     reg = Registry(server, rt, config.general.profile)
     for module in (system, screen, mouse, keyboard, window, ui, browser):
         module.register(reg)

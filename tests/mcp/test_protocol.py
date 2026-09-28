@@ -77,3 +77,17 @@ async def test_every_result_has_audit_id_and_duration(harness):
     assert env["audit_id"].startswith("act_") and "duration_ms" in env
     env = await harness.err("window_focus", {"query": {"title": "Nope"}}, "WINDOW_NOT_FOUND")
     assert env["audit_id"] and env["error"]["suggestions"]
+
+
+async def test_invalid_arguments_get_structured_error(harness):
+    res = await harness.client.call_tool("mouse_click", {"x": "abc", "y": 10})
+    env = res.structured_content
+    assert res.is_error and env["ok"] is False
+    assert env["error"]["code"] == "INVALID_ARGUMENT"
+    assert "x" in env["error"]["details"]["fields"]
+    assert env["audit_id"] and harness.rt.audit.memory[-1]["error"] == "INVALID_ARGUMENT"
+
+
+async def test_unknown_tool_structured(harness):
+    res = await harness.client.call_tool("no_such_tool", {})
+    assert res.structured_content["error"]["code"] == "NOT_FOUND"

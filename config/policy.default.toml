@@ -7,7 +7,7 @@
 # operate  : + files, starting apps (future phases)
 # full     : + shell, killing processes (future phases) — still with confirmations
 level = "interact"
-# Which tools are exposed: observe | desktop | full
+# Which tools are exposed: observe | desktop | browser | full
 profile = "desktop"
 # Human confirmation channels, in order of preference. native_dialog is a dialog shown by this
 # server on the local desktop (the AI client cannot answer it). elicitation asks through the MCP client.
@@ -29,6 +29,8 @@ log_typed_text = false
 
 [privacy]
 redact_patterns = ["credit_card", "cpf", "api_key"]
+# Windows of these processes are blacked out in every screenshot (never sent to the model).
+never_capture_processes = ["keepassxc.exe", "keepass.exe", "1password.exe", "bitwarden.exe"]
 
 [processes]
 kill_protected = ["csrss.exe", "wininit.exe", "winlogon.exe", "lsass.exe", "services.exe", "smss.exe",
@@ -42,3 +44,26 @@ max_long_edge = 1568
 # Clicking an element whose label contains one of these words requires human confirmation.
 high_impact_keywords = ["excluir", "apagar", "deletar", "delete", "pagar", "pay", "comprar", "buy", "purchase",
                         "transferir", "transfer", "enviar", "send", "desinstalar", "uninstall"]
+
+[filesystem]
+# Folders the agent may save downloads into / upload files from. "known:<Folder>" follows the real
+# user folder (including OneDrive redirection).
+allowed_roots = ["known:Downloads", "known:Documents", "known:Desktop", "~/AgentWorkspace"]
+denied_globs = ["**/.ssh/**", "**/.gnupg/**", "**/.aws/**", "**/*.kdbx", "**/*.pem", "**/*.key", "**/.env",
+                "**/.env.*", "**/.git-credentials", "**/.netrc",
+                "**/AppData/Roaming/Microsoft/Credentials/**", "**/AppData/Local/Google/Chrome/User Data/**",
+                "**/AppData/Local/Microsoft/Edge/User Data/**"]
+
+[browser]
+# chromium (Playwright build) | msedge | chrome
+channel = "chromium"
+executable_path = ""
+headless = false
+# A profile dedicated to the agent, separate from your personal browser profile.
+profile_dir = "~/AgentWorkspace/browser-profile"
+# Empty allowlist = any site except the denylist. Entries also match subdomains.
+url_allowlist = []
+url_denylist = []
+# Running arbitrary JavaScript in pages; each call is also confirmed.
+allow_evaluate = false
+default_timeout_ms = 15000

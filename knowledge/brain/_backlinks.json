@@ -1,0 +1,98 @@
+{
+  "Backend Windows": {
+    "inbound": [
+      "CI no Windows Real",
+      "MCP-PC-CONTROL",
+      "Python e SDK MCP 2.x",
+      "UI Automation Tools"
+    ],
+    "count": 4
+  },
+  "CI no Windows Real": {
+    "inbound": [
+      "Backend Windows",
+      "MCP-PC-CONTROL"
+    ],
+    "count": 2
+  },
+  "Ciclo Observar-Verificar": {
+    "inbound": [
+      "MCP-PC-CONTROL",
+      "Verificação com expect"
+    ],
+    "count": 2
+  },
+  "Confirmação por diálogo nativo": {
+    "inbound": [
+      "Modelo de Segurança"
+    ],
+    "count": 1
+  },
+  "Fase 3 fora do escopo": {
+    "inbound": [
+      "Fase 4 Navegador",
+      "MCP-PC-CONTROL",
+      "Modelo de Segurança"
+    ],
+    "count": 3
+  },
+  "Fase 4 Navegador": {
+    "inbound": [
+      "Fase 3 fora do escopo",
+      "MCP-PC-CONTROL"
+    ],
+    "count": 2
+  },
+  "Indicador na bandeja": {
+    "inbound": [],
+    "count": 0
+  },
+  "MCP-PC-CONTROL": {
+    "inbound": [
+      "Backend Windows",
+      "CI no Windows Real",
+      "Ciclo Observar-Verificar",
+      "Confirmação por diálogo nativo",
+      "Fase 3 fora do escopo",
+      "Fase 4 Navegador",
+      "Modelo de Segurança",
+      "Python e SDK MCP 2.x",
+      "UI Automation Tools",
+      "Verificação com expect"
+    ],
+    "count": 10
+  },
+  "Modelo de Segurança": {
+    "inbound": [
+      "Confirmação por diálogo nativo",
+      "Fase 3 fora do escopo",
+      "Indicador na bandeja",
+      "MCP-PC-CONTROL",
+      "UI Automation Tools"
+    ],
+    "count": 5
+  },
+  "Python e SDK MCP 2.x": {
+    "inbound": [
+      "MCP-PC-CONTROL"
+    ],
+    "count": 1
+  },
+  "UI Automation Tools": {
+    "inbound": [
+      "Backend Windows",
+      "Ciclo Observar-Verificar",
+      "MCP-PC-CONTROL",
+      "Verificação com expect"
+    ],
+    "count": 4
+  },
+  "Verificação com expect": {
+    "inbound": [
+      "Ciclo Observar-Verificar",
+      "MCP-PC-CONTROL",
+      "UI Automation Tools"
+    ],
+    "count": 3
+  }
+}

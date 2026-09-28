@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "id": "2026-09-28_sessao-mcp-pc-control",
+      "type": "agent-logs",
+      "path": "raw/sources/agent-logs/2026-09-28_sessao-mcp-pc-control.md",
+      "date": "2026-09-28",
+      "status": "ingested"
+    }
+  ],
+  "last_updated": "2026-09-28"
+}

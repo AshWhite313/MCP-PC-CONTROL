@@ -2,8 +2,8 @@
 title: Fase 4 Navegador
 type: milestone
 created: 2026-09-28
-last_updated: 2026-09-28
-status: active
+last_updated: 2026-10-01
+status: archived
 related: ["[[MCP-PC-CONTROL]]", "[[Fase 3 fora do escopo]]"]
 sources: ["2026-09-28_sessao-mcp-pc-control"]
 aliases: ["browser_*", "Playwright"]

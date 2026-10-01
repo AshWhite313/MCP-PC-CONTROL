@@ -6,7 +6,35 @@
       "path": "raw/sources/agent-logs/2026-09-28_sessao-mcp-pc-control.md",
       "date": "2026-09-28",
       "status": "ingested"
+    },
+    {
+      "id": "2026-10-01_sessao-mcp-pc-control-parte-2",
+      "type": "agent-logs",
+      "path": "raw/sources/agent-logs/2026-10-01_sessao-mcp-pc-control-parte-2.md",
+      "date": "2026-10-01",
+      "status": "ingested"
+    },
+    {
+      "id": "2026-09-27_plano-arquitetura",
+      "type": "docs",
+      "path": "raw/sources/docs/2026-09-27_plano-arquitetura.md",
+      "date": "2026-09-27",
+      "status": "ingested"
+    },
+    {
+      "id": "2026-09-27_adr-0001-fundacao",
+      "type": "docs",
+      "path": "raw/sources/docs/2026-09-27_adr-0001-fundacao.md",
+      "date": "2026-09-27",
+      "status": "ingested"
+    },
+    {
+      "id": "2026-09-28_adr-0002-fases-4-a-6",
+      "type": "docs",
+      "path": "raw/sources/docs/2026-09-28_adr-0002-fases-4-a-6.md",
+      "date": "2026-09-28",
+      "status": "ingested"
     }
   ],
-  "last_updated": "2026-09-28"
+  "last_updated": "2026-10-01"
 }

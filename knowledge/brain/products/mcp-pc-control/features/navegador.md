@@ -2,7 +2,7 @@
 title: Navegador
 type: product
 created: 2026-09-28
-last_updated: 2026-09-28
+last_updated: 2026-10-01
 status: active
 related: ["[[MCP-PC-CONTROL]]", "[[Modelo de Segurança]]", "[[Fase 4 Navegador]]"]
 sources: ["2026-09-28_sessao-mcp-pc-control"]
@@ -21,7 +21,7 @@ tags: [navegador, playwright, fase-4]
 ## Design
 
 - **Perfil dedicado do agente**, separado do navegador pessoal do usuário.
-- Refs de elementos (`b1`, `b2`) vêm de um snapshot da página feito por JS injetado; as ações usam seletores de atributo, que o Playwright reavalia no DOM ao vivo (a ref sobrevive a pequenas mudanças).
+- Refs de elementos (`b1`, `b2`) vêm de um snapshot da página feito por JS injetado (ver [[Refs do navegador por JS injetado]]); as ações usam seletores de atributo, que o Playwright reavalia no DOM ao vivo (a ref sobrevive a pequenas mudanças).
 - Executável resolvido por config: build do Playwright, canal instalado (Edge/Chrome) ou caminho explícito.
 
 ## Segurança

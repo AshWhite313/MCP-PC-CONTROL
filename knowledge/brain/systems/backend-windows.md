@@ -2,7 +2,7 @@
 title: Backend Windows
 type: system
 created: 2026-09-27
-last_updated: 2026-09-28
+last_updated: 2026-10-01
 status: active
 related: ["[[MCP-PC-CONTROL]]", "[[UI Automation Tools]]", "[[CI no Windows Real]]"]
 sources: ["2026-09-28_sessao-mcp-pc-control"]
@@ -20,6 +20,9 @@ Implementação dos contratos de plataforma do [[MCP-PC-CONTROL]] para Windows 1
 - `__init__.py`: tela (mss), input (SendInput), janelas (Win32 e DWM), sistema, diálogo de confirmação e hotkey do kill switch.
 - `uia.py`: UI Automation via comtypes.
 - `keymap.py`: nomes de teclas para virtual-key codes.
+- `tray.py`: ícone na bandeja e hotkey do kill switch, ver [[Hardening]].
+- `clipboard.py`: clipboard de texto via Win32.
+- `ocr.py`: OCR via WinRT, opcional, ver [[OCR opcional]].
 
 ## Notas operacionais
 

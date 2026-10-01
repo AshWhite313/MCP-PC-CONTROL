@@ -2,9 +2,9 @@
 title: MCP-PC-CONTROL
 type: product
 created: 2026-09-27
-last_updated: 2026-09-28
+last_updated: 2026-10-01
 status: active
-related: ["[[Ciclo Observar-Verificar]]", "[[Backend Windows]]", "[[UI Automation Tools]]", "[[Verificação com expect]]", "[[Modelo de Segurança]]", "[[Navegador]]", "[[OCR e Visão]]"]
+related: ["[[Ciclo Observar-Verificar]]", "[[Backend Windows]]", "[[UI Automation Tools]]", "[[Verificação com expect]]", "[[Modelo de Segurança]]", "[[Navegador]]", "[[OCR e Visão]]", "[[Hardening]]", "[[Arquivos, Clipboard e Processos]]", "[[Catálogo de Tools]]", "[[Roadmap]]"]
 sources: ["2026-09-28_sessao-mcp-pc-control"]
 aliases: ["pc-control", "mcp-pc-control", "MCP de controle do PC"]
 tags: [mcp, computer-use, windows]
@@ -36,10 +36,10 @@ Linux e macOS estão previstos como backends futuros.
 | 0 | Fundação | concluída |
 | 1 | Tela, mouse, teclado, janelas (29 tools) | concluída, testada no Windows real |
 | 2 | [[UI Automation Tools]], comparação de tela (16 tools) | concluída, testada no Windows real |
-| 3 | Modelo simples: arquivos, clipboard, lista de processos | parcial, ver [[Fase 3 fora do escopo]] |
+| 3 | Modelo simples: arquivos, clipboard, lista de processos | parcial, ver [[Arquivos, Clipboard e Processos]] e [[Fase 3 fora do escopo]] |
 | 4 | Navegador | concluída, ver [[Fase 4 Navegador]] |
 | 5 | OCR, visão e privacidade | concluída, ver [[OCR e Visão]] |
-| 6 | Hardening: erros estruturados, bandeja, diagnóstico | concluída |
+| 6 | Hardening: erros estruturados, bandeja, diagnóstico | concluída, ver [[Hardening]] |
 
 Total publicado: 75 tools, 141 testes (desktop simulado + Chromium real) e testes de fumaça no Windows via CI.
 
@@ -47,10 +47,12 @@ Total publicado: 75 tools, 141 testes (desktop simulado + Chromium real) e teste
 
 Python 3.11+, SDK MCP 2.x (ver [[Python e SDK MCP 2.x]]), ctypes para Win32, mss para captura, comtypes para UI Automation, Pillow, pydantic, uv, ruff, pytest com anyio.
 
+Lista completa em [[Catálogo de Tools]]; estado das fases em [[Roadmap]]; limites em [[Limitações e Riscos]]; instalação em [[Instalar e Testar]]; histórico da conversa em [[Sessão de desenvolvimento do MCP-PC-CONTROL]].
+
 ## Documentos
 
 - `docs/PLANO_ARQUITETURA.md`: plano completo (tools, riscos, segurança, roadmap, testes).
-- `docs/adr/0001-fundacao.md`: decisões da fundação.
+- `docs/adr/0001-fundacao.md` e `docs/adr/0002-fases-4-a-6.md`: decisões de arquitetura.
 - `README.md`: instalação no Claude Desktop e no Claude Code.
 
 ## Open Questions

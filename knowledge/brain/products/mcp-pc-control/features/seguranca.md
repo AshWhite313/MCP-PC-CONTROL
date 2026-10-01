@@ -2,9 +2,9 @@
 title: Modelo de Segurança
 type: product
 created: 2026-09-27
-last_updated: 2026-09-28
+last_updated: 2026-10-01
 status: active
-related: ["[[MCP-PC-CONTROL]]", "[[Confirmação por diálogo nativo]]", "[[Fase 3 fora do escopo]]"]
+related: ["[[MCP-PC-CONTROL]]", "[[Confirmação por diálogo nativo]]", "[[Fase 3 fora do escopo]]", "[[Limitações e Riscos]]"]
 sources: ["2026-09-28_sessao-mcp-pc-control"]
 aliases: ["segurança", "política", "kill switch", "auditoria"]
 tags: [seguranca]
@@ -27,10 +27,16 @@ Conjunto de controles do [[MCP-PC-CONTROL]]. A premissa é que o modelo não é 
 - Janelas elevadas (UIPI), UAC e tela de bloqueio não são automatizadas: erros `ELEVATED_TARGET` e `SECURE_DESKTOP`.
 - Processos protegidos nunca são encerrados por `window_close` forçado.
 
+- Ícone na bandeja com parar/retomar, ver [[Hardening]].
+- Zonas de privacidade: janelas de apps sensíveis ficam pretas em toda captura, ver [[OCR e Visão]].
+- `PathGuard` limita arquivos, downloads e uploads a pastas permitidas, ver [[PathGuard antecipado]].
+- Guarda de URL e perfil dedicado no [[Navegador]]; `browser_evaluate` desligado por padrão.
+- Clipboard nunca lê conteúdo marcado como privado por gerenciadores de senha.
+- Erros de parâmetros também saem estruturados e auditados.
+
 ## Pendências
 
-- Indicador visual na bandeja ainda não existe; o kill switch avisa com bipe.
-- Zonas de privacidade em capturas estão planejadas para a Fase 5.
+- Pausar automaticamente quando o usuário usa mouse ou teclado ainda não existe.
 
 ## See Also
 

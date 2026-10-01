@@ -1,19 +1,39 @@
 {
+  "Arquivos, Clipboard e Processos": {
+    "inbound": [
+      "MCP-PC-CONTROL",
+      "PathGuard antecipado",
+      "Roadmap",
+      "Sessão de desenvolvimento do MCP-PC-CONTROL"
+    ],
+    "count": 4
+  },
   "Backend Windows": {
     "inbound": [
       "CI no Windows Real",
+      "Limitações e Riscos",
       "MCP-PC-CONTROL",
       "Python e SDK MCP 2.x",
       "UI Automation Tools"
     ],
-    "count": 4
+    "count": 5
   },
   "CI no Windows Real": {
     "inbound": [
       "Backend Windows",
-      "MCP-PC-CONTROL"
+      "Instalar e Testar",
+      "MCP-PC-CONTROL",
+      "OCR opcional"
     ],
-    "count": 2
+    "count": 4
+  },
+  "Catálogo de Tools": {
+    "inbound": [
+      "Arquivos, Clipboard e Processos",
+      "MCP-PC-CONTROL",
+      "Roadmap"
+    ],
+    "count": 3
   },
   "Ciclo Observar-Verificar": {
     "inbound": [
@@ -31,66 +51,154 @@
   },
   "Fase 3 fora do escopo": {
     "inbound": [
+      "Arquivos, Clipboard e Processos",
+      "Catálogo de Tools",
       "Fase 4 Navegador",
       "MCP-PC-CONTROL",
-      "Modelo de Segurança"
+      "Modelo de Segurança",
+      "Roadmap",
+      "Sessão de desenvolvimento do MCP-PC-CONTROL"
     ],
-    "count": 3
+    "count": 7
   },
   "Fase 4 Navegador": {
     "inbound": [
       "Fase 3 fora do escopo",
       "MCP-PC-CONTROL",
-      "Navegador"
+      "Navegador",
+      "Roadmap"
+    ],
+    "count": 4
+  },
+  "Hardening": {
+    "inbound": [
+      "Backend Windows",
+      "Instalar e Testar",
+      "MCP-PC-CONTROL",
+      "Modelo de Segurança",
+      "Roadmap"
+    ],
+    "count": 5
+  },
+  "Indicador na bandeja": {
+    "inbound": [
+      "Hardening"
+    ],
+    "count": 1
+  },
+  "Instalar e Testar": {
+    "inbound": [
+      "Hardening",
+      "MCP-PC-CONTROL",
+      "Sessão de desenvolvimento do MCP-PC-CONTROL"
     ],
     "count": 3
   },
-  "Indicador na bandeja": {
-    "inbound": [],
-    "count": 0
+  "Limitações e Riscos": {
+    "inbound": [
+      "MCP-PC-CONTROL",
+      "Modelo de Segurança",
+      "Roadmap"
+    ],
+    "count": 3
   },
   "MCP-PC-CONTROL": {
     "inbound": [
+      "Arquivos, Clipboard e Processos",
       "Backend Windows",
       "CI no Windows Real",
+      "Catálogo de Tools",
       "Ciclo Observar-Verificar",
       "Confirmação por diálogo nativo",
       "Fase 3 fora do escopo",
       "Fase 4 Navegador",
+      "Hardening",
+      "Instalar e Testar",
+      "Limitações e Riscos",
       "Modelo de Segurança",
       "Navegador",
       "OCR e Visão",
       "Python e SDK MCP 2.x",
+      "Refs do navegador por JS injetado",
+      "Roadmap",
+      "Sessão de desenvolvimento do MCP-PC-CONTROL",
       "UI Automation Tools",
       "Verificação com expect"
     ],
-    "count": 12
+    "count": 20
   },
   "Modelo de Segurança": {
     "inbound": [
+      "Arquivos, Clipboard e Processos",
+      "Catálogo de Tools",
       "Confirmação por diálogo nativo",
       "Fase 3 fora do escopo",
+      "Hardening",
       "Indicador na bandeja",
+      "Limitações e Riscos",
       "MCP-PC-CONTROL",
       "Navegador",
       "OCR e Visão",
+      "PathGuard antecipado",
       "UI Automation Tools"
     ],
-    "count": 7
+    "count": 12
   },
   "Navegador": {
     "inbound": [
-      "MCP-PC-CONTROL"
+      "Arquivos, Clipboard e Processos",
+      "CI no Windows Real",
+      "MCP-PC-CONTROL",
+      "Modelo de Segurança",
+      "PathGuard antecipado",
+      "Refs do navegador por JS injetado",
+      "Roadmap"
     ],
-    "count": 1
+    "count": 7
   },
   "OCR e Visão": {
     "inbound": [
-      "MCP-PC-CONTROL"
+      "MCP-PC-CONTROL",
+      "Modelo de Segurança",
+      "OCR opcional",
+      "Roadmap"
+    ],
+    "count": 4
+  },
+  "OCR opcional": {
+    "inbound": [
+      "Backend Windows"
+    ],
+    "count": 1
+  },
+  "PathGuard antecipado": {
+    "inbound": [
+      "Modelo de Segurança"
     ],
     "count": 1
   },
   "Python e SDK MCP 2.x": {
+    "inbound": [
+      "MCP-PC-CONTROL"
+    ],
+    "count": 1
+  },
+  "Refs do navegador por JS injetado": {
+    "inbound": [
+      "Navegador"
+    ],
+    "count": 1
+  },
+  "Roadmap": {
+    "inbound": [
+      "Catálogo de Tools",
+      "Limitações e Riscos",
+      "MCP-PC-CONTROL",
+      "Sessão de desenvolvimento do MCP-PC-CONTROL"
+    ],
+    "count": 4
+  },
+  "Sessão de desenvolvimento do MCP-PC-CONTROL": {
     "inbound": [
       "MCP-PC-CONTROL"
     ],
@@ -102,9 +210,10 @@
       "Ciclo Observar-Verificar",
       "MCP-PC-CONTROL",
       "OCR e Visão",
+      "Roadmap",
       "Verificação com expect"
     ],
-    "count": 5
+    "count": 6
   },
   "Verificação com expect": {
     "inbound": [

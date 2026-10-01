@@ -1,25 +1,29 @@
 # Brain Schema
 
-Last updated: 2026-09-28
+Last updated: 2026-10-01
 
 ## Directories
 
-| Path | Type | Pages | Description |
-|------|------|-------|-------------|
-| products/mcp-pc-control/ | product | 4 | Visão geral e funcionalidades do servidor MCP |
-| products/mcp-pc-control/decisions/ | decision | 3 | Decisões de arquitetura e de escopo |
-| systems/ | system | 1 | Backends por sistema operacional |
-| concepts/ | concept | 1 | Princípios de design |
-| processes/ | process | 1 | CI e validação |
-| work/milestones/ | milestone | 1 | Fases do roadmap |
-| work/tasks/ | task | 1 | Pendências |
+| Path | Type | Pages |
+|------|------|-------|
+| concepts/ | concept | 1 |
+| events/ | event | 1 |
+| processes/ | process | 2 |
+| products/mcp-pc-control/ | product | 2 |
+| products/mcp-pc-control/decisions/ | decision | 6 |
+| products/mcp-pc-control/features/ | product | 7 |
+| strategy/ | concept | 1 |
+| systems/ | system | 1 |
+| work/milestones/ | milestone | 2 |
+| work/tasks/ | task | 1 |
 
 ## Frontmatter Fields in Use
 
-title, type, created, last_updated, status, related, sources, aliases, tags; decision_date e impact em decisões; knowledge_refs e priority em trabalho.
+title, type, created, last_updated, status, related, sources, aliases, tags; decision_date e impact em decisões; knowledge_refs e priority em trabalho; event_type, date_start, date_end e location em eventos.
 
 ## Naming Conventions
 
 - Arquivos em kebab-case minúsculo, sem acentos.
-- Decisões: `{YYYY-MM-DD}_{slug}.md`.
+- Decisões e eventos: `{YYYY-MM-DD}_{slug}.md`.
 - Títulos e conteúdo em português; nomes de tools e código em inglês.
+- Fontes brutas em `raw/sources/{tipo}/{YYYY-MM-DD}_{slug}.md`, nunca editadas depois de ingeridas.

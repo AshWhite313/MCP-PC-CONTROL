@@ -18,3 +18,10 @@ Append-only. Most recent last.
 ## 2026-09-28 update: Fase 6 e modelo simples da Fase 3
 - Fase 6 concluída (erros estruturados, bandeja, `--check`). [[Indicador na bandeja]] arquivado como resolvido.
 - Modelo simples da Fase 3 entregue; [[Fase 3 fora do escopo]] atualizado. Total: 75 tools.
+
+## 2026-10-01 ingest `2026-10-01_sessao-mcp-pc-control-parte-2`, plano e ADRs
+- Revisão pedida pelo usuário: o brain não cobria as Fases 4 a 6, o modelo simples da Fase 3, o plano nem as decisões do ADR 0002.
+- Novas fontes: parte 2 da sessão, `docs/PLANO_ARQUITETURA.md`, ADR 0001 e ADR 0002.
+- Novas páginas: [[Catálogo de Tools]], [[Hardening]], [[Arquivos, Clipboard e Processos]], [[Refs do navegador por JS injetado]], [[OCR opcional]], [[PathGuard antecipado]], [[Roadmap]], [[Limitações e Riscos]], [[Instalar e Testar]] e [[Sessão de desenvolvimento do MCP-PC-CONTROL]].
+- Atualizadas: [[MCP-PC-CONTROL]], [[Modelo de Segurança]], [[Backend Windows]], [[CI no Windows Real]], [[Navegador]]; [[Fase 4 Navegador]] arquivado como concluído.
+- Índice, backlinks e schema regenerados. 24 páginas, nenhum link quebrado.
